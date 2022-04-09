@@ -1,15 +1,70 @@
-\documentclass[10pt,a4paper,twocolumn]{article}
-\usepackage[utf8]{inputenc}
-\usepackage[english]{babel}
-\usepackage{amsmath}
-\usepackage{amsfonts}
-\usepackage{amssymb}
-\author{Maximilian Heim}
-\title{Exploring Return Oriented Programming}
+%%%% IACR Transactions TEMPLATE %%%%
+% This file shows how to use the iacrtrans class to write a paper.
+% Written by Gaetan Leurent gaetan.leurent@inria.fr (2020)
+% Public Domain (CC0)
+
+
+%%%% 1. DOCUMENTCLASS %%%%
+\documentclass[journal=tosc,submission]{iacrtrans}
+%%%% NOTES:
+% - Change "journal=tosc" to "journal=tches" if needed
+% - Change "submission" to "final" for final version
+% - Add "spthm" for LNCS-like theorems
+
+
+%%%% 3. AUTHOR, INSTITUTE %%%%
+\author{Heim, Maximilian}
+\institute{
+  Institute University Albstadt-Sigmaringen, Albstadt-Ebingen, Germany, \email{MaximilianHeim@protonmail.com}
+}
+%%%% NOTES:
+% - We need a city name for indexation purpose, even if it is redundant
+%   (eg: University of Atlantis, Atlantis, Atlantis)
+% - \inst{} can be omitted if there is a single institute,
+%   or exactly one institute per author
+
+
+%%%% 4. TITLE %%%%
+\title{An Introduction to Return Oriented Programming}
+%%%% NOTES:
+% - If the title is too long, or includes special macro, please
+%   provide a "running title" as optional argument: \title[Short]{Long}
+% - You can provide an optional subtitle with \subtitle.
+
 \begin{document}
+
 \maketitle
-\section{Abstract}
+
+
+%%%% 5. KEYWORDS %%%%
+\keywords{ROP, Return Oriented Programming, Exploit}
+
+
+%%%% 6. ABSTRACT %%%%
+\begin{abstract}
+  In this paper we explore the possibilities of Return Oriented Programming
+\end{abstract}
+
+
+%%%% 7. PAPER CONTENT %%%%
 \section{Introduction}
+
+\section{Methods}
+
+\section{Proof of concept}
+
 \section{Conclusion}
-\bibliography{bib.bib}
+
+\section{Main Result}
+\label{sec:main}
+
+
+%%%% 8. BILBIOGRAPHY %%%%
+\bibliographystyle{alpha}
+\bibliography{abbrev3,crypto,biblio}
+%%%% NOTES
+% - Download abbrev3.bib and crypto.bib from https://cryptobib.di.ens.fr/
+% - Use bilbio.bib for additional references not in the cryptobib database.
+%   If possible, take them from DBLP.
+
 \end{document}
