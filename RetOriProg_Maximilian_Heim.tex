@@ -34,8 +34,21 @@
     \item A type of buffer overflow attack
     \item Instead of writing executable code onto the stack we place return addresses onto the stack
     \item These get executed sequentially
-    \item Using this technique we can have arbitrary code execution in large enough programs
+    \item Using this technique we can achieve arbitrary code execution in large enough programs
     \end{enumerate}
+\end{frame}
+
+\begin{frame}
+    \frametitle{How does it work?}
+    \begin{enumerate}
+        \item We have to find "gadgets" in programs
+        \item Gadgets are machine instructions that end on a return or jump
+    \end{enumerate}
+    \begin{figure}[h]
+        \caption{ROP Gadgets}
+        \centering
+        \includegraphics[width=0.9\textwidth]{gadget.png}\label{gadget}
+    \end{figure}
 \end{frame}
 \subsection{Relevanz}
 \begin{frame}
