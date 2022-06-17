@@ -1,0 +1,33 @@
+This is pdfTeX, Version 3.141592653-2.6-1.40.23 (TeX Live 2021/Arch Linux) (preloaded format=pdflatex 2022.1.5)  21 MAR 2022 18:02
+entering extended mode
+ restricted \write18 enabled.
+ %&-line parsing enabled.
+**ret_oriented_prog.tex
+(./ret_oriented_prog.tex
+LaTeX2e <2021-11-15> patch level 1
+L3 programming layer <2021-11-22> (./iacrtrans.cls
+Document Class: iacrtrans 2016/08/26 v0.24 IACR Transactions Author Class
+
+! LaTeX Error: File `lastpage.sty' not found.
+
+Type X to quit or <RETURN> to proceed,
+or enter new name. (Default extension: sty)
+
+Enter file name: 
+! Emergency stop.
+<read *> 
+         
+l.52 \def
+         \IACR@lp{\pageref*{LastPage}}^^M
+*** (cannot \read from terminal in nonstop modes)
+
+ 
+Here is how much of TeX's memory you used:
+ 44 strings out of 478353
+ 916 string characters out of 5854636
+ 296236 words of memory out of 5000000
+ 18266 multiletter control sequences out of 15000+600000
+ 403430 words of font info for 27 fonts, out of 8000000 for 9000
+ 1141 hyphenation exceptions out of 8191
+ 34i,0n,43p,144b,17s stack positions out of 5000i,500n,10000p,200000b,80000s
+!  ==> Fatal error occurred, no output PDF file produced!
