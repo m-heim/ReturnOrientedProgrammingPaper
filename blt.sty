@@ -1,0 +1,97 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{blt}[2022/05/10 A package with useful Latex commands]
+\RequirePackage{listings}
+\RequirePackage{xcolor}
+\RequirePackage{hyperref}
+\RequirePackage[nameinlink]{cleveref}
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+\definecolor{light}{RGB}{255,255,227}
+
+\lstdefinestyle{code}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2,
+}
+\lstdefinestyle{bash}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2,
+    language=bash
+}
+\lstdefinestyle{commandline}{
+    backgroundcolor=\color{black},
+    basicstyle=\ttfamily\small\color{white},
+    xleftmargin=0.1\textwidth,
+    xrightmargin=0.1\textwidth,
+    escapechar=§,
+    breakatwhitespace=false,      
+    breaklines=true,
+    captionpos=t,
+    keepspaces=true,             
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2,
+    language=bash,
+    prebreak={\textbackslash},
+    breakindent=10ex
+}
+\lstdefinestyle{result}{
+    backgroundcolor=\color{light},
+    basicstyle=\ttfamily\small\color{black}\center,
+    xleftmargin=0.1\textwidth,
+    xrightmargin=0.1\textwidth,
+    escapechar=§,
+    breakatwhitespace=false,         
+    breaklines=true,
+    captionpos=t,                    
+    keepspaces=true,                               
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2,
+    breakindent=0px
+}
+\crefname{listing}{Lst.}{Lsts}
+\crefname{figure}{Fig.}{Figs}
+\crefname{section}{Sec.}{Secs}
+\newcommand{\bltCode}[4]{
+    \lstinputlisting[style=code, language=#2, caption=#3, captionpos=t, label=#4]{#1}
+}
+\newcommand{\bltVerbFile}[3]{
+        \lstinputlisting[captionpos=t, caption={#2}, label={#3}, style=result]{#1}
+}
+\newcommand{\bltPrompt}[0]{\mbox{\space bash\$-\space}}
+\newcommand{\bltGdbPrompt}[0]{\mbox{(gdb)}}
