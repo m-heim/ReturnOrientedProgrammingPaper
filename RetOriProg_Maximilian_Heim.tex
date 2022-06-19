@@ -7,12 +7,13 @@
 \usepackage{amsfonts}
 \usepackage{amssymb}
 \usepackage{graphicx}
+\usepackage{fancyvrb}
 %\usepackage{circuitikz}
 \author{Maximilian Heim}
 \title{Return Oriented Programming}
 %\setbeamercovered{transparent} 
 %\setbeamertemplate{navigation symbols}{} 
-\logo{\includegraphics[width=1.5cm]{1200px-Hsas_logo.svg.png}}
+\logo{\includegraphics[width=0.1\textwidth]{logo.png}}
 \institute{University Albstadt-Sigmaringen} 
 \date{\today} 
 \subject{Offensive Security Methods}
@@ -30,65 +31,63 @@
 \subsection{Return Oriented Programming}
 \begin{frame}
     \frametitle{What is Return Oriented Programming?}
-    \begin{enumerate}
-    \item A type of buffer overflow attack
-    \item Instead of writing executable code onto the stack we place return addresses onto the stack
-    \item These get executed sequentially
-    \item Using this technique we can achieve arbitrary code execution in large enough programs
-    \end{enumerate}
+    \begin{itemize}
+    \item A type attack that exploits buffer overruns
+    \item Published by Hovav Shacham in 2007
+    \item Arised as a technique to counter security mechanisms (NX)
+    \item Big binary $\rightarrow$ ROP is turing complete
+    \item Many authors refer to ret-to-libc as ROP
+    \end{itemize}
 \end{frame}
 
+\section{How does it work?}
 \begin{frame}
-    \frametitle{How does it work?}
+    \frametitle{Overview}
     \begin{enumerate}
-        \item We have to find "gadgets" in programs
-        \item Gadgets are machine instructions that end on a return or jump
+        \item Search the binary for gadgets: return (0xC3) bytes that contain useful instructions before
+        \item Generate a list of these gadgets, called ROP chain
+        \item Generate a payload with the addresses of these gadgets
+        \item Insert payload via buffer overrun
     \end{enumerate}
+\end{frame}
+\begin{frame}
+    \frametitle{ROP gadgets}
+    \begin{itemize}
+        \item Gadgets are machine instructions that end on a return
+        \item Tools: ROPgadget (\url{https://github.com/JonathanSalwan/ROPgadget}), ropper (\url{https://github.com/sashs/Ropper}), Radare2, pwntools....
+    \end{itemize}
     \begin{figure}[h]
         \caption{ROP Gadgets}
         \centering
-        \includegraphics[width=0.9\textwidth]{gadget.png}\label{gadget}
+        \includegraphics[width=0.8\textwidth]{gadget.png}\label{gadget}
     \end{figure}
+
 \end{frame}
-\subsection{Relevanz}
-\begin{frame}
-    \frametitle{Warum ist es wichtig diese zu erkennen?}
+
+\begin{frame}[fragile]
+    \frametitle{Useful gadgets: Write to register}
     \begin{itemize}
-    \item Militär
-    \item Finanzen
-    \item Energie
-    \item Geheimdienste
-    \item Überwachungsstaaten
-    \item Transport
-    \item U.v.m \ldots
+        \item Especially useful are pop instructions
     \end{itemize}
-
-\end{frame}
-
-
-\section{Erkennung}
-\subsection{Destruktive Erkennung}
-\begin{frame}
-    \frametitle{Reverse Engineering}
+    \begin{Verbatim}
+        POP eax, ret;
+    \end{Verbatim}
     \begin{itemize}
-        \item Entfernen der Oberfläche Schicht für Schicht
-        \item Advantages: 
-        \begin{enumerate}
-            \item 100 \% detection rate
-        \end{enumerate}
-        \item Disadvantages:
-        \begin{enumerate}
-            \item Only tests a single chip
-            \item Chip unusable afterwards
-            \item Very time consuming
-        \end{enumerate}
-        \item However, 
+        \item These allow us to write arbitrary values into registers
+        \item However, sometimes we do not find a pop into our desired register (e.g. r14), here we can improvise and use something like
     \end{itemize}
+    \begin{Verbatim}
+        xor r14, r14
+        pop r12
+        xor r14, r12
+    \end{Verbatim}
 \end{frame}
-\subsection{Nicht-Destruktive Erkennung}
-\section{Conclusion}
+
 \begin{frame}
-    \frametitle{Types of detection}
+    \frametitle{References}
+    \url{https://trustfoundry.net/basic-rop-techniques-and-tricks/}
+    
 \end{frame}
+
 
 \end{document}

@@ -1,0 +1,16 @@
+\frametitle{Useful gadgets: Write to register}
+    \begin{itemize}
+        \item Especially useful are pop instructions
+    \end{itemize}
+    \begin{Verbatim}
+        POP eax, ret;
+    \end{Verbatim}
+    \begin{itemize}
+        \item These allow us to write arbitrary values into registers
+        \item However, sometimes we do not find a pop into our desired register (e.g. r14), here we can improvise and use something like
+    \end{itemize}
+    \begin{Verbatim}
+        xor r14, r14
+        pop r12
+        xor r14, r12
+    \end{Verbatim}
