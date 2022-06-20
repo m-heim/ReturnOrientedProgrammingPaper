@@ -103,16 +103,12 @@
         \item Combined with pop this is very powerful
     \end{itemize}
 \end{frame}
+
 \begin{frame}[fragile]
-    \frametitle{Useful gadgets: Arithmetics}
+    \frametitle{Useful gadgets: Systemcalls, arithmetics}
     \begin{itemize}
-        \item add, sub, div, xor, mul, div\ldots allow us to manipulate register contents. Again, in combination with pop we can manipulate the program state significantly
-    \end{itemize}
-\end{frame}
-\begin{frame}[fragile]
-    \frametitle{Useful gadgets: Systemcalls}
-    \begin{itemize}
-        \item Since programs run in userspace we have limited privileges, if we can find systemcalls we can, in combination with the arithmetic operations and pop instructions call arbitrary system calls if we can find
+        \item add, sub, div, xor, mul, div\ldots allow us to manipulate register contents.
+        \item Since programs run in userspace we have limited privileges, if we can find systemcalls we can, in combination with the arithmetic operations and pop instructions call arbitrary system calls
     \end{itemize}
     \begin{Verbatim}
         int 0x80; ret;
@@ -237,10 +233,10 @@ print p
 \begin{frame}
     \frametitle{Conclusion}
     \begin{itemize}
-        \item Return Oriented Programming is a very powerful technique to exploit buffer overruns
+        \item Return Oriented Programming is a very powerful
         \item It is able to execute any system call if there are enough rop gadgets
         \item There are many tools to simplify the process of finding ROP gadgets and generatating ROP payloads
-        \item Since modern desktop systems use ASLR it is hard to use this technique
+        \item Modern desktops use aslr and other protection mechanisms $\rightarrow$ practically impossible to use ROP
     \end{itemize}
 \end{frame}
 
