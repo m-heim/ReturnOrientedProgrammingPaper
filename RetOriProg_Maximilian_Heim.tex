@@ -150,7 +150,7 @@ int main(int argc, char *argv[])
     \end{lstlisting}
 \end{frame}
 \begin{frame}
-    \frametitle{Working example: Finding gadgets}
+    \frametitle{Working example: Spawning a shell}
     \begin{itemize}
         \item Using ropper we can find our desired gadgets
         \item Lets say we want to execute a shell using execve, for that we need to accomplish the following goals
@@ -233,7 +233,7 @@ print p
 \begin{frame}
     \frametitle{Conclusion}
     \begin{itemize}
-        \item Return Oriented Programming is a very powerful
+        \item Return Oriented Programming is a very powerful technique
         \item It is able to execute any system call if there are enough rop gadgets
         \item There are many tools to simplify the process of finding ROP gadgets and generatating ROP payloads
         \item Modern desktops use aslr and other protection mechanisms $\rightarrow$ practically impossible to use ROP
