@@ -50,8 +50,8 @@
 \lstdefinestyle{commandline}{
     backgroundcolor=\color{black},
     basicstyle=\ttfamily\small\color{white},
-    xleftmargin=0.1\textwidth,
-    xrightmargin=0.1\textwidth,
+    xleftmargin=0.05\textwidth,
+    xrightmargin=0.05\textwidth,
     escapechar=§,
     breakatwhitespace=false,      
     breaklines=true,
@@ -65,7 +65,7 @@
     tabsize=2,
     language=bash,
     prebreak={\textbackslash},
-    breakindent=10ex
+    breakindent=2ex
 }
 \lstdefinestyle{result}{
     backgroundcolor=\color{light},
@@ -91,7 +91,10 @@
     \lstinputlisting[style=code, language=#2, caption=#3, captionpos=t, label=#4]{#1}
 }
 \newcommand{\bltVerbFile}[3]{
-        \lstinputlisting[captionpos=t, caption={#2}, label={#3}, style=result]{#1}
+        \lstinputlisting[captionpos=t, caption=#2, label=#3, style=result]{#1}
+}
+\newcommand{\bltCommand}[3]{
+    \lstinputlisting[style=commandline, caption=#2, captionpos=t, label=#3]{#1}
 }
 \newcommand{\bltPrompt}[0]{\mbox{\space bash\$-\space}}
 \newcommand{\bltGdbPrompt}[0]{\mbox{(gdb)}}

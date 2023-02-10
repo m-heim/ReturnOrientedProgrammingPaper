@@ -135,14 +135,11 @@ int 0x80; ret;
 \end{frame}
 
 \section{Example: Open a shell}
-\subsection{Target Program}
-\begin{frame}
-    \frametitle{Target Program and compilation}
-    \begin{lstlisting}[breaklines, style=commandline]
-clang -o vuln vuln.c -m32 -fno-stack-protector  -Wl,-z,relro,-z,now,-z,noexecstack -static
-    \end{lstlisting}
-    
+\subsection{Target Program and Compilation}
+\begin{frame}[fragile]
+    \frametitle{Target Program and Compliation}
     \bltCode{vuln.c}{c}{Target Program (stack protectors must be off)}{targetprogram}
+    \bltCommand{compliation.sh}{Compilation command}{comp}
 \end{frame}
 \subsection{General approach}
 \begin{frame}[fragile]
