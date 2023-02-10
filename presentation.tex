@@ -138,9 +138,10 @@ int 0x80; ret;
 \subsection{Target Program}
 \begin{frame}
     \frametitle{Target Program and compilation}
-    %\begin{lstlisting}[breaklines, style=commandline]
-%clang -o vuln vuln.c -m32 -fno-stack-protector  -Wl,-z,relro,-z,now,-z,noexecstack -static
-    %\end{lstlisting}
+    \begin{lstlisting}[breaklines, style=commandline]
+clang -o vuln vuln.c -m32 -fno-stack-protector  -Wl,-z,relro,-z,now,-z,noexecstack -static
+    \end{lstlisting}
+    
     \bltCode{vuln.c}{c}{Target Program (stack protectors must be off)}{targetprogram}
 \end{frame}
 \subsection{General approach}
@@ -243,6 +244,14 @@ print p
     \url{http://gauss.ececs.uc.edu/Courses/c6056/pdf/rop.pdf}
     \url{https://www.proggen.org/doku.php?id=security:memory-corruption:exploitation:rop}
     \url{https://shell-storm.org/talks/ROP_course_lecture_jonathan_salwan_2014.pdf}
+\end{frame}
+
+\section*{Appendix}
+\subsection*{Proof that ROP is Turing Complete}
+\begin{frame}
+    \frametitle{Proof that ROP is Turing Complete}
+    What is turing completeness? \url{https://en.wikipedia.org/wiki/Turing_completeness}
+    Refer to proof from \url{https://drwho.virtadpt.net/files/mov.pdf} that x86 MOV itself is turing complete, from that we can conclude that mov, with access to the pop instruction is enough to make ROP itself turing complete.
 \end{frame}
 
 

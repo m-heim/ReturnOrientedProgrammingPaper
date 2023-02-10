@@ -1,7 +1,5 @@
-#include <mqueue.h>
 #include <stdio.h>
 #include <string.h>
-#include <threads.h>
 
 int main(int argc, char *argv[]) {
   char buffer[8] = {0};
