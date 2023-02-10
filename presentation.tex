@@ -15,7 +15,9 @@
 \title{Return Oriented Programming}
 %\setbeamercovered{transparent} 
 %\setbeamertemplate{navigation symbols}{} 
-\logo{\includegraphics[width=0.1\textwidth]{logo.png}}
+\logo{ 
+    \includegraphics[width=0.09\textwidth]{./img/logo.png}
+}
 \institute{University Albstadt-Sigmaringen} 
 \date{\today} 
 \subject{Offensive Security Methods}
@@ -70,7 +72,7 @@
     \begin{figure}[h]
         \caption{ROP Gadgets}
         \centering
-        \includegraphics[width=0.8\textwidth]{gadget.png}\label{gadget}
+        \includegraphics[width=0.8\textwidth]{./img/gadget.png}\label{gadget}
     \end{figure}
 
 \end{frame}
@@ -80,16 +82,16 @@
     \begin{itemize}
         \item Especially useful are pop instructions
     \end{itemize}
-    \begin{Verbatim}
-        POP eax; ret;
-    \end{Verbatim}
+\begin{lstlisting}[style=result]
+    POP eax; ret;
+\end{lstlisting}
     \begin{itemize}
         \item These allow us to write arbitrary values into registers
         \item However, sometimes we do not find a pop into our desired register (e.g. r14), here we can improvise and use something like
     \end{itemize}
-    \begin{Verbatim}
-        XOR r14, r14; pop r12; XOR r14, r12; ret;
-    \end{Verbatim}
+\begin{lstlisting}[style=result]
+XOR r14, r14; pop r12; XOR r14, r12; ret;
+\end{lstlisting}
 \end{frame}
 
 \begin{frame}[fragile]
@@ -97,15 +99,15 @@
     \begin{itemize}
         \item Move instructions are also really useful
     \end{itemize}
-    \begin{Verbatim}
-        mov [rax], rxc; ret;
-    \end{Verbatim}
+\begin{lstlisting}[style=result]
+mov [rax], rxc; ret;
+\end{lstlisting}
     \begin{itemize}
         \item allows us to write into memory
     \end{itemize}
-    \begin{Verbatim}
-        mov rax, [rxc]; ret;
-    \end{Verbatim}
+\begin{lstlisting}[style=result]
+mov rax, [rxc]; ret;
+\end{lstlisting}
     \begin{itemize}
         \item allows us to read a value from memory into a register
         \item Combined with pop this is very powerful
@@ -118,9 +120,9 @@
         \item add, sub, div, xor, mul, div\ldots allow us to manipulate register contents
         \item Since programs run in userspace we have limited privileges, if we can find systemcalls we can, in combination with the arithmetic operations and pop instructions call arbitrary system calls
     \end{itemize}
-    \begin{Verbatim}
-        int 0x80; ret;
-    \end{Verbatim}
+\begin{lstlisting}[style=result]
+int 0x80; ret;
+\end{lstlisting}
 \end{frame}
 \subsection{ROP chain}
 \begin{frame}
@@ -128,38 +130,21 @@
     \begin{figure}[h]
         \caption{ROP Chain with parameter}
         \centering
-        \includegraphics[width=0.18\textwidth]{gadgetstack.png}\label{gadget2}
+        \includegraphics[width=0.18\textwidth]{./img/gadgetstack.png}\label{gadget2}
     \end{figure}
 \end{frame}
 
 \section{Example: Open a shell}
 \subsection{Target Program}
-\begin{frame}[fragile]
+\begin{frame}
     \frametitle{Target Program and compilation}
-    \begin{itemize}
-        \item We compile the following program with stack protectors turned off
-    \end{itemize}
     %\begin{lstlisting}[breaklines, style=commandline]
 %clang -o vuln vuln.c -m32 -fno-stack-protector  -Wl,-z,relro,-z,now,-z,noexecstack -static
     %\end{lstlisting}
-    \begin{lstlisting}[style=code, language=c]
-#include <stdio.h>
-#include <string.h>
-int main(int argc, char *argv[])
-{
-    char buffer[8] = {0};
-    if(argc != 2)
-    {
-        printf("A single argument is required.\n");
-        return 1;
-    }
-    strcpy(buffer, argv[1]);
-    return 0;
-}
-    \end{lstlisting}
+    \bltCode{vuln.c}{c}{Target Program (stack protectors must be off)}{targetprogram}
 \end{frame}
 \subsection{General approach}
-\begin{frame}
+\begin{frame}[fragile]
     \frametitle{Spawning a shell: Approach}
     \begin{itemize}
         \item Using ropper we can find our desired gadgets
