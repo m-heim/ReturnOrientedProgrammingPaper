@@ -43,9 +43,12 @@
 \begin{frame}
     \frametitle{What is Return Oriented Programming?}
     \begin{itemize}
-    \item A type attack that exploits buffer overruns
-    \item Published by Hovav Shacham in 2007
+    \item A type of attack that exploits buffer overruns
     \item Arised as a technique to counter security mechanisms (NX)
+    \item Research by Hovav Shacham et al in 2007 - "When good instructions go bad: generalizing return-oriented programming to RISC"
+    \item Blackhat conference 2008, Hovav Shacham - "Return-oriented Programming:
+    Exploitation without Code Injection" \url{https://hovav.net/ucsd/talks/blackhat08.html}
+    \item Paper published by Ryan Roemer, Erik Buchanan, Hovav Shacham and Stefan Savage in 2012 - "Return-Oriented Programming: Systems, Languages, and Applications" 
     \item Big binary $\rightarrow$ ROP is turing complete
     \item Many authors refer to ret-to-libc/library as ROP, according to the founder of this technique it has to be differentiated and ROP describes chaining of small code segments
     \end{itemize}
@@ -132,6 +135,21 @@ int 0x80; ret;
         \centering
         \includegraphics[width=0.18\textwidth]{./img/gadgetstack.png}\label{gadget2}
     \end{figure}
+\end{frame}
+
+\section{How to find suitable Gadgets?}
+\begin{frame}
+    \begin{itemize}
+    \item Search gadgets
+    \end{itemize}
+    \bltCommand{ropcommand.sh}{Dumping Gadgets}{dumpgadget}
+    \begin{itemize}
+        \item 34011 Gadgets - 716,056 kB binary
+        \item Most of them are not very useful but the sheer size makes it likely we have suitable candidates, using regular expressions we can find suitable candidates fast
+        \item Example 1: pop edx $\rightarrow$ \regex{\^{}.* pop edx ; .*ret}
+        \item Example 2: int 0x80 $\rightarrow$ \regex{\^{}.* int 0x80}
+        \item Example 3: xor eax, eax $\rightarrow$ \regex{\^{}.* xor eax, eax ; .*ret}
+    \end{itemize}
 \end{frame}
 
 \section{Example: Open a shell}
