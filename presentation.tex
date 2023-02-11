@@ -139,16 +139,16 @@ int 0x80; ret;
 
 \section{How to find suitable Gadgets?}
 \begin{frame}
+    \frametitle{How to find suitable Gadgets?}
     \begin{itemize}
-    \item Search gadgets
+    \item Multiple methods, using the tools directly you can search gadgets of your liking, but we can also dump them into a file and search using regular expressions.
     \end{itemize}
     \bltCommand{ropcommand.sh}{Dumping Gadgets}{dumpgadget}
     \begin{itemize}
-        \item 34011 Gadgets - 716,056 kB binary
-        \item Most of them are not very useful but the sheer size makes it likely we have suitable candidates, using regular expressions we can find suitable candidates fast
-        \item Example 1: pop edx $\rightarrow$ \regex{\^{}.* pop edx ; .*ret}
-        \item Example 2: int 0x80 $\rightarrow$ \regex{\^{}.* int 0x80}
-        \item Example 3: xor eax, eax $\rightarrow$ \regex{\^{}.* xor eax, eax ; .*ret}
+        \item Most of them are not very useful because they are very specific, amount compensates for that 716 kB binary $\rightarrow$ 34011 Gadgets
+        \item Example 1: pop edx $\rightarrow$ \regex{\^{}.\{0,10\}pop edx ;.\{0,10\}ret}
+        \item Example 2: int 0x80 $\rightarrow$ \regex{\^{}.\{0,10\}int 0x80}
+        \item Example 3: xor eax, eax $\rightarrow$ \regex{\^{}.\{0,10\}xor eax, eax ;.\{0,10\}ret}
     \end{itemize}
 \end{frame}
 
@@ -163,7 +163,7 @@ int 0x80; ret;
 \begin{frame}[fragile]
     \frametitle{Spawning a shell: Approach}
     \begin{itemize}
-        \item Using ropper we can find our desired gadgets
+        \item Using ROPgadget we can find our desired gadgets
         \item Lets say we want to execute a shell using execve, for that we need to accomplish the following goals
         \begin{enumerate}
             \item write /bin/sh into memory (at the data segment)
@@ -171,6 +171,7 @@ int 0x80; ret;
             \item init systemcall argument (address of /bin//sh)
             \item call systemcall
         \end{enumerate}
+        \item All of this has to be done using Bytes that are not \Verb+\\0x00+ because thats the character used for identifying the end of a string.
     \end{itemize}
 \end{frame}
 \subsection{Generating the payload}
