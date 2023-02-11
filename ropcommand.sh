@@ -1,1 +1,1 @@
-ROPgadget --binary vuln > gadgets
+ROPgadget --binary ./vuln --nojop > gadgets

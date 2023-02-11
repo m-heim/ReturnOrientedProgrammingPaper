@@ -59,9 +59,23 @@ Return Oriented Programming is a type of buffer overflow attack that has been pu
 
 \section{Gadgets}
 \label{sec:main}
-Gadgets are code segments that sit before a \Verb+ret+ instruction, that is an instruction that uses the address on the stack to return to a previous stack frame and therefor a previous level in the call hierarchy. This means we can arbitrarily chain these gadgets and achieve arbitary code execution if we find gadgets for our purpose. A gadget can be found by searching for \Verb+0xC3+ Bytes in the program. The instructions before then represent the code we can use, for that we need the address of the gadget. We could do this manually or use one of the many tools available, to name a few there is ropper, ROPgadget and pwntools. For this paper i will be using ROPgadget since i found it easy to use and fast. Using the following command under Arch Linux we can dump all gadgets to a file and search in it using regular expressions.
-\bltCommand{ropcommand.sh}{Dumping all gadgets into a file}{dumpallgadgets}
+\paragraph{Introduction}
+Gadgets are code segments that sit before a \Verb+ret+ instruction, that is an instruction that uses the address on the stack to return to a previous stack frame and therefor a previous level in the call hierarchy. This means we can arbitrarily chain these gadgets and achieve arbitary code execution if we find gadgets for our purpose.
 
+\paragraph{How to find Gadgets}
+A gadget can be found by searching for \Verb+0xC3+ Bytes in the program. The instructions before then represent the code we can use, for that we need the address of the gadget. We could do this manually using tools like \Verb+objdump+, \Verb+hexdump+ or use one of the many tools available, to name a few there is \Verb+ropper+, \Verb+ROPgadget+ and \Verb+pwntools+. For this paper i will be using \Verb+ROPgadget+ since i found it easy to use and fast. Using the following command under Arch Linux we can dump all gadgets to a file and search in it using regular expressions.
+\paragraph{Finding gadgets using ROPgadget}
+\bltCommand{ropcommand.sh}{Dumping all gadgets into a file}{dumpallgadgets}
+this produces an output with results like these.
+\bltResult{dumppick}{Output of ROPgadget}{outputropgadget}
+These are only 10 Lines out of the 8244 lines found by the tool though. It is clearly visible that many candidates for ROP can be found, even in a file with a relatively small size of 72 kB. Though most of these gadgets are not all that useful because they often modify a lot of registers, possibly messing up the desired state or using a fixed return address. In most cases we can find suitable candidates using resular expressions though.
+\paragraph{Useful gadgets for exploits}
+\subparagraph{pop}
+\subparagraph{mov}
+\subparagraph{arithmetics}
+\subparagraph{int}
+\paragraph{Filtering the gadgets}
+We can use the tools directly or use the desired gadgets using regular expressions. In order to make this paper more general and easy to replicate i will be using regular expressions to find the desired gadgets.
 \section{Target Program}
 \paragraph{Target Program}
 The following program is the target of our attack, it uses an argument for the buffer overflow, using vulnerable input functions also works, though.

@@ -10,6 +10,7 @@
 \definecolor{codepurple}{rgb}{0.58,0,0.82}
 \definecolor{backcolour}{rgb}{0.95,0.95,0.92}
 \definecolor{light}{RGB}{255,255,227}
+\definecolor{lightblue}{rgb}{0.7,0.8,1.0}
 
 \lstdefinestyle{code}{
     backgroundcolor=\color{backcolour},   
@@ -27,7 +28,8 @@
     showspaces=false,                
     showstringspaces=false,
     showtabs=false,                  
-    tabsize=2
+    tabsize=2,
+    breakindent=3ex
 }
 \lstdefinestyle{bash}{
     backgroundcolor=\color{backcolour},   
@@ -46,7 +48,8 @@
     showstringspaces=false,
     showtabs=false,                  
     tabsize=2,
-    language=bash
+    language=bash,
+    breakindent=3ex
 }
 \lstdefinestyle{commandline}{
     backgroundcolor=\color{black},
@@ -66,10 +69,10 @@
     tabsize=2,
     language=bash,
     prebreak={\textbackslash},
-    breakindent=2ex
+    breakindent=3ex
 }
 \lstdefinestyle{result}{
-    backgroundcolor=\color{light},
+    backgroundcolor=\color{lightblue},
     basicstyle=\ttfamily\small\color{black}\center,
     xleftmargin=0.1\textwidth,
     xrightmargin=0.1\textwidth,
@@ -83,7 +86,7 @@
     showstringspaces=false,
     showtabs=false,                  
     tabsize=2,
-    breakindent=0px
+    breakindent=3ex
 }
 \crefname{listing}{Lst.}{Lsts}
 \crefname{figure}{Fig.}{Figs}
@@ -99,4 +102,7 @@
 }
 \newcommand{\bltPrompt}[0]{\mbox{\space bash\$-\space}}
 \newcommand{\bltGdbPrompt}[0]{\mbox{(gdb)}}
-\newcommand{\regex}[1]{\mbox{\colorbox{red!30}{\textsc{#1}}}}
+\newcommand{\bltRegex}[1]{\mbox{\colorbox{red!30}{\textsc{#1}}}}
+\newcommand{\bltResult}[3]{
+    \lstinputlisting[style=result, caption=#2, captionpos=t, label=#3]{#1}
+}

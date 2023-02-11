@@ -146,9 +146,9 @@ int 0x80; ret;
     \bltCommand{ropcommand.sh}{Dumping Gadgets}{dumpgadget}
     \begin{itemize}
         \item Most of them are not very useful because they are very specific, amount compensates for that 716 kB binary $\rightarrow$ 34011 Gadgets
-        \item Example 1: pop edx $\rightarrow$ \regex{\^{}.\{0,10\}pop edx ;.\{0,10\}ret}
-        \item Example 2: int 0x80 $\rightarrow$ \regex{\^{}.\{0,10\}int 0x80}
-        \item Example 3: xor eax, eax $\rightarrow$ \regex{\^{}.\{0,10\}xor eax, eax ;.\{0,10\}ret}
+        \item Example 1: pop edx $\rightarrow$ \bltRegex{\^{}.\{0,10\}pop edx ;.\{0,10\}ret}
+        \item Example 2: int 0x80 $\rightarrow$ \bltRegex{\^{}.\{0,10\}int 0x80}
+        \item Example 3: xor eax, eax $\rightarrow$ \bltRegex{\^{}.\{0,10\}xor eax, eax ;.\{0,10\}ret}
     \end{itemize}
 \end{frame}
 
