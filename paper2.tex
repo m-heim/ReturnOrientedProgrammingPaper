@@ -12,14 +12,10 @@
 % - Add "spthm" for LNCS-like theorems
 
 
-%%%% 2. PACKAGES %%%%
-\usepackage{lipsum} % Example package -- can be removed
-
-
 %%%% 3. AUTHOR, INSTITUTE %%%%
-\author{Maximilian Heim}
+\author{Heim, Maximilian}
 \institute{
-  University Albstadt-Sigmaringen, Albstadt, Germany, \email{MaximilianHeim@protonmail.com}
+  Institute University Albstadt-Sigmaringen, Albstadt-Ebingen, Germany, \email{MaximilianHeim@protonmail.com}
 }
 %%%% NOTES:
 % - We need a city name for indexation purpose, even if it is redundant
@@ -29,7 +25,7 @@
 
 
 %%%% 4. TITLE %%%%
-\title{Return Oriented Programming}
+\title{An Introduction to Return Oriented Programming}
 %%%% NOTES:
 % - If the title is too long, or includes special macro, please
 %   provide a "running title" as optional argument: \title[Short]{Long}
@@ -41,33 +37,27 @@
 
 
 %%%% 5. KEYWORDS %%%%
-\keywords{ROP \and Return Oriented Programming \and Buffer Overflow \and Binary Exploitation}
+\keywords{ROP, Return Oriented Programming, Exploit}
 
 
 %%%% 6. ABSTRACT %%%%
 \begin{abstract}
-  In this paper we introduce the concept of Return Oriented Programming, how to apply it, how to protect against it and show a concrete attack.
+  In this paper we explore the possibilities of Return Oriented Programming
 \end{abstract}
 
 
 %%%% 7. PAPER CONTENT %%%%
 \section{Introduction}
 
-Return Oriented Programming is a type of buffer overflow attack that has been published in 2007 and ever since has become a widely known buffer overflow technique. It has been developed to circumvent the NX-BIT protection that protects the stack from being executed. At the time of writing this paper modern techniques like Stack Carnaries and ASLR prevent these attacks from being practical but there are millions of running systems using old hard-, firm- and software that is possibly vulnerable to these kinds of buffer overflow attacks. Return Oriented Programming is based on chaining return addresses to code just before a return and therefor allowing almost arbitrary code segments to be chained.
+\section{Methods}
 
+\section{Proof of concept}
 
-\section{Gadgets}
+\section{Conclusion}
+
+\section{Main Result}
 \label{sec:main}
 
-\section{Target Program}
-
-\section{Attack}
-
-\section{Results}
-
-\section{Protection}
-
-\section{Discussion}
 
 %%%% 8. BILBIOGRAPHY %%%%
 \bibliographystyle{alpha}
