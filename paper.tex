@@ -55,7 +55,7 @@
 
 %%%% 7. PAPER CONTENT %%%%
 \section{Introduction}
-
+BIBLIOGRAFIE NICHT VERGESSEN
 Return Oriented Programming is a type of buffer overflow attack that has been published in 2007 and ever since has become a widely known buffer overflow technique. It has been developed to circumvent the NX-BIT protection that protects the stack from being executed. At the time of writing this paper modern techniques like Stack Carnaries and ASLR prevent these attacks from being practical but there are millions of running systems using old hard-, firm- and software that is possibly vulnerable to these kinds of buffer overflow attacks. Return Oriented Programming is based on chaining return addresses to code just before a return and therefor allowing almost arbitrary code segments to be chained.
 
 
@@ -68,18 +68,21 @@ Gadgets are code segments that sit before a \Verb+ret+ instruction, that is an i
 A gadget can be found by searching for \Verb+0xC3+ Bytes in the program. The instructions before then represent the code we can use, for that we need the address of the gadget. We could do this manually using tools like \Verb+objdump+, \Verb+hexdump+ or use one of the many tools available, to name a few there is \Verb+ropper+, \Verb+ROPgadget+ and \Verb+pwntools+. For this paper i will be using \Verb+ROPgadget+ since i found it easy to use and fast. Using the following command~\cref{dumpallgadgets} under Linux we can dump all gadgets to a file and search in it using regular expressions, \Verb+ROPgadget+ can be found in most package managers or can be downloaded directly from \url{https://github.com/JonathanSalwan/ROPgadget}.
 \paragraph{Finding gadgets using ROPgadget}
 \bltCommand{ropcommand.sh}{Dumping all gadgets into a file}{dumpallgadgets}
-Using this command produces an output with results similar theseto this.
+Using this command produces an output with results similar to this.
 \bltResult{dumppick}{Output of ROPgadget}{outputropgadget}
-These are only 10 Lines out of the 8244 lines found by the tool though and i purposefully filtered out some good and bad ones for demonstration. It is clearly visible that many candidates for ROP can be found, even in a file with a relatively small size of 72 kB. Though most of these gadgets are not all that useful because they often modify a lot of registers, possibly messing up the desired state or use a fixed return address. In most cases we can find suitable candidates using resular expressions though, this will be demonstrated later in this section.
-\paragraph{Useful gadgets for exploits}
-\subparagraph{pop}
-Pop allows us to write arbitrary values into registers. For that we search for an \Verb+pop <reg>+ instruction inside our gadgets, in the payload we can then place the value after the address of the pop instruction. If we can not find a suitable gadget we can try to get creative and achieve the desired state another way. If for example we want to write some value into ecx we could use something like this: \Verb+xor ecx, ecx ; pop eax ; xor ecx, eax+. Provided that we have these gadgets available.
-\subparagraph{mov}
-Mov allows us to write arbitrary values into memory. For that we search for an \Verb+mov dword ptr [<reg1>], <reg2>+ instruction inside our gadgets, we can then, in combination with two pops write arbitrary values at arbitary memory locations, we could use something like this to accomplish that: \Verb+pop ecx ; pop eax ; mov dword ptr [eax], ecx+
-\subparagraph{arithmetics}
-\subparagraph{int}
-\paragraph{Filtering the gadgets}
-We can use the tools directly or use the desired gadgets using regular expressions. In order to make this paper more general and easy to replicate i will be using regular expressions to find the desired gadgets
+These are only 10 Lines out of the 8244 lines found by the tool though and i purposefully filtered out some good and bad ones for demonstration. It is clearly visible that many candidates for ROP can be found, even in a file with a relatively small size of 72 kB. Though most of these gadgets are not all that useful because they often modify a lot of registers, possibly messing up the desired state or use a fixed return address. In most cases we can find suitable candidates using regular expressions though, this will be demonstrated later in this section.
+\paragraph{Overview of powerful gadgets}
+\paragraph{pop}
+Pop allows us to write arbitrary values into registers. For that we search for a \Verb+pop <reg>+ instruction inside our gadgets, in the payload we can then place the value after the address of the pop instruction. If we can not find a suitable gadget we can try to get creative and achieve the desired state another way. If for example we want to write some value into ecx we could use something like this: \Verb+xor ecx, ecx ; pop eax ; xor ecx, eax+. Provided that we have these gadgets available.
+\paragraph{mov}
+Mov allows us to write arbitrary values into memory. For that we search for a \Verb+mov dword ptr [<reg1>], <reg2>+ instruction inside our gadgets, we can then, in combination with two pops write arbitrary values at arbitary memory locations, we could use something like this to accomplish that: \Verb+pop ecx ; pop eax ; mov dword ptr [eax], ecx+
+\paragraph{arithmetics, boolean algebra}
+Arithmetic operations like add, sub, inc, xor, or, and can be useful to bring registers into our desired state. For that we search for the corresponding gadget with the required operands. For example xor can be used to clear a register or copy its contents. It often occurs in the following forms: \Verb+xor eax, eax+ or \Verb+xor eax, edx+. The first case clears the register since xor computes an anti equivalence, formally $a \oplus a = 0$ and the second one copies the value of the 2nd operand into the 1st operand when the target register is \Verb+0x00+ since \Verb+0x00+ is the neutral element of the xor operation, formally $a \oplus 0 = a$.
+\paragraph{int}
+Int stand for a system interrupt which causes a system call to be executed. System calls are kernelspace programs that require higher privileges than what is available in a userspace program. Examples for system calls include io and \Verb+execve+ which allows to execute arbitary programs. In combination with pop, mov and other instructions we can specify the concrete system call. One of the most powerful system calls for blackhats is bash since it allows permanently implementing malware or gain insight into files.
+\subsection{Filtering the gadgets}
+\paragraph{Introduction}
+In order to find the gadgets we want we can use the tools directly or we can use regular expressions. In order to make this paper more general and easy to replicate i will be using regular expressions to find the desired gadgets.
 \paragraph{Gadgets and their corresponding Regular Expression}
 The following table describes what regex we can use to find the gadgets needed for the attack.
 
@@ -91,8 +94,10 @@ The following table describes what regex we can use to find the gadgets needed f
 \item xor eax, eax  $\rightarrow$ \bltRegex{\^{}.\{0,20\}xor eax, eax.\{0,20\}ret\\n} 
 \end{itemize}
 
-for all of these regular expressions i was able to find at least a few suitable candidates. If there arent any results the amount of possible characters before or after the gadget can be increased until results show up. It is however desirable to have gadgets with as few and noninterfering instructions as possible, if this is accomplished we can almost use the instructions we found like in assembly. Gadgets which do multiple things at once however can mess up the desired state and break the payload so it is important to thoroughly analyze the gadgets before using them.
-\section{Target Program}
+for all of these regular expressions i was able to find at least a few suitable candidates. If there are no results the amount of possible characters before or after the gadget can be increased until results show up. It is however desirable to have gadgets with as few and noninterfering instructions as possible, if this is accomplished we can almost use the instructions we found like in assembly. Gadgets which do multiple things at once however can mess up the desired state and break the payload so it is important to thoroughly analyze the gadgets before using them.
+
+\section{Attack}
+\subsection{Target Program}
 \paragraph{Target Program}
 The following program is the target of our attack, it uses a command line argument to provide the payload and \Verb+strcpy+ for the buffer overflow, overwriting the return address after the 8 Byte buffer. Using vulnerable input functions also works though.
 \bltCode{vuln.c}{c}{The Target Program}{thetargetprogram}
@@ -101,10 +106,11 @@ The following program is the target of our attack, it uses a command line argume
 We use the following command to compile the target program
 \bltCommand{compilation.sh}{The compliation command}{thecompilationcommand}
 
-\section{Attack}
+\subsection{Phases of developing the attack}
+\paragraph{Phases}
 The attack consists of several phases
 \begin{enumerate}
-  \item Specify concrete goal
+  \item Specify concrete goal with required program state and instructions
   \item Generate desired list of instructions and arguments (abstract payload)
   \item Extract gadgets using tools
   \item Search gadgets for instructions
@@ -112,8 +118,15 @@ The attack consists of several phases
   \item Insert payload into target
 \end{enumerate}
 
+\paragraph{Goal and abstract payload}
+After specifying the goal and possibly simplifying it we have to write a list of instructions and arguments that achieve the goal, for this its favorable to directly use the format of the final payload except for using instructions instead of addresses as this will then allow to simply insert the found gadgets into this abstract payload.
+\paragraph{Extract and search gadgets}
+After extracting the gadgets using one of the above mentioned methods we can search for gadgets
+
+As described above you should 
+
 \paragraph{struct.pack}
-\Verb+struct.pack+ is a Python function that allows to easily generate our desired payload from the raw bytes, in bash we can then pipe the generated payload into our target
+\Verb+struct.pack+ is a Python function that allows to easily generate our desired payload from the raw bytes. Bash then allows to directly pipe the generated payload into our target. In order to generate the payload we first have to fill the buffer and override the EBP with arbitary values as seen in line 2~\cref{howtopack}. This is usually done using easily recognizable characters, using the letter \Verb+A+ for this is common. It has the hex value \Verb+0x41+, doing this allows then to spot the buffer in a debugger like \Verb+gdb+. So in this example we fill the buffer with 8 \Verb+A+'s and 4 \Verb+B+'s. After that it is time to insert the addresses of the gadgets and the arguments. This is done by calling pack with the double word (64 Bit) while specifying the endianness, converting that to a string and adding it to the string as seen in line 3~\cref{howtopack}. After the whole payload has been generated we can print it and use the output directly for running the buffer overflow attack as mentioned above.
 \bltCode{pack.py}{python}{How to use struct.pack}{howtopack}
 \section{Results}
 
