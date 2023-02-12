@@ -1,10 +1,10 @@
-0x0805778d : pop edx ; mov eax, 0x16 ; pop ebx ; pop esi ; ret
-0x08061224 : pop edx ; or byte ptr [ecx], bh ; pop eax ; or byte ptr [edi], cl ; dec ebp ; ret 0x4589
-0x0809efcd : pop edx ; or byte ptr [ecx], bh ; retf
+0x08059ee3 : mov word ptr [edx], ax ; mov eax, edx ; ret
+0x08071e4e : mov esp, 0xc70cec83 ; ret 0xffe0
+0x0807faa3 : sti ; xor eax, eax ; ret
 0x0808b285 : pop edx ; xor eax, eax ; pop edi ; ret
-0x0806b9f1 : pop es ; add byte ptr [eax], al ; lea esi, [esi] ; pop ebx ; ret
-0x0808770a : pop es ; add byte ptr [eax], al ; pop ebx ; ret
-0x0809cc28 : pop es ; add byte ptr [ebx + 0x5e5b1cc4], al ; pop edi ; pop ebp ; ret
+0x080539e7 : mov esp, 0x39fffffd ; ret
+0x0804b8d4 : xchg eax, esp ; ret
+0x08095aef : mov esi, eax ; pop ebx ; mov eax, esi ; pop esi ; pop edi ; pop ebp ; ret
 0x0806ceec : pop es ; add byte ptr [ebx - 0x39], dl ; ret 0xffd4
-0x08096496 : pop es ; add esp, 0x2c ; pop ebx ; pop esi ; pop edi ; pop ebp ; ret
-0x08051a88 : pop es ; add esp, 8 ; pop ebx ; ret
+0x0804a444 : or eax, 0xffffffff ; ret
+0x08051bce : dec eax ; ret
