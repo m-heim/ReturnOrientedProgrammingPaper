@@ -43,10 +43,10 @@
 \begin{frame}
     \frametitle{What is Return Oriented Programming?}
     \begin{itemize}
-    \item A type of attack that exploits buffer overruns in which we chain addresses of instructions right before returns.
-    \item Arised as a technique to counter security mechanisms (NX)
-    \item Research by Hovav Shacham et al in 2007, in 2008 the attack got demonstrated at Blackhat 2008 - "Return-oriented Programming: Exploitation without Code Injection" \url{https://hovav.net/ucsd/talks/blackhat08.html}
-    \item Many authors refer to ret-to-libc/library as ROP, according to the founder of this technique it has to be differentiated and ROP describes chaining of small code segments
+    \item A type of attack that exploits buffer overruns. Makes use of existent instructions in the program.
+    \item Arised as a technique to counter security mechanisms (NX).
+    \item Research by Hovav Shacham et al in 2007, in 2008 the attack got demonstrated at Blackhat - "Return-oriented Programming: Exploitation without Code Injection" \url{https://hovav.net/ucsd/talks/blackhat08.html}
+    \item Many authors refer to ret-to-libc/library as ROP, according to the founder of this technique it has to be differentiated. Chaining code segments vs calling function.
     \end{itemize}
 \end{frame}
 
@@ -57,8 +57,8 @@
     \begin{enumerate}
         \item Search the binary for gadgets: return (0xC3) bytes that contain useful instructions before
         \item Generate a list of these gadgets, called ROP chain
-        \item Generate a payload with the addresses of these gadgets
-        \item Insert payload via buffer overrun
+        \item Generate a payload with the addresses of these gadgets and the parameters
+        \item Insert payload via buffer overrun vulnerability
     \end{enumerate} 
 \end{frame}
 \subsection{ROP gadgets}
@@ -66,6 +66,7 @@
     \frametitle{ROP gadgets}
     \begin{itemize}
         \item Gadgets are machine instructions that end on a return
+        \item Most of them are not very useful because they are very specific, but the amount compensates for that. 716 kB binary $\rightarrow$ 8236 Gadgets
         \item Tools: ROPgadget (\url{https://github.com/JonathanSalwan/ROPgadget}), ropper (\url{https://github.com/sashs/Ropper}), Radare2, pwntools....
     \end{itemize}
     \bltResult{dumppick2}{Output of ROPgadget}{outputropgadget}
@@ -110,10 +111,10 @@ mov eax, [ecx]; ret;
 \end{frame}
 
 \begin{frame}[fragile]
-    \frametitle{Useful gadgets: Arithmetics}
+    \frametitle{Useful gadgets: Arithmetics, System calls}
     \begin{itemize}
-        \item add, sub, xor \ldots allow us to manipulate register contents
-        \item Programs run in userspace with limited privileges, systemcalls allow to execute operations which require higher privileges.
+        \item Artihmetics: add, xor, inc \ldots allow us to manipulate register contents
+        \item System calls: Programs run in userspace with limited privileges, system calls allow to execute operations which require higher privileges.
     \end{itemize}
 \begin{lstlisting}[style=result]
 int 0x80; ret;
@@ -127,21 +128,6 @@ int 0x80; ret;
         \centering
         \includegraphics[width=0.18\textwidth]{./img/gadgetstack.png}\label{gadget2}
     \end{figure}
-\end{frame}
-
-\section{How to find suitable Gadgets?}
-\begin{frame}
-    \frametitle{How to find suitable Gadgets?}
-    \begin{itemize}
-    \item Multiple methods, using the tools directly you can search gadgets of your liking, but we can also dump them into a file and search using regular expressions.
-    \end{itemize}
-    \bltCommand{ropcommand.sh}{Dumping Gadgets}{dumpgadget}
-    \begin{itemize}
-        \item Most of them are not very useful because they are very specific, but the amount compensates for that. 716 kB binary $\rightarrow$ 8236 Gadgets
-        \item pop edx $\rightarrow$ \bltRegex{\^{}.\{0,20\}pop edx.\{0,20\}ret\textbackslash{}n}
-        \item int 0x80 $\rightarrow$ \bltRegex{\^{}.\{0,20\}int 0x80}
-        \item xor eax, eax $\rightarrow$ \bltRegex{\^{}.\{0,20\}xor eax, eax.\{0,20\}ret\textbackslash{}n}
-    \end{itemize}
 \end{frame}
 
 \section{Example: Open a shell}
@@ -159,8 +145,8 @@ int 0x80; ret;
         \item Lets say we want to execute a shell using execve, for that we need to accomplish the following goals
         \begin{enumerate}
             \item write /bin/sh into memory (at the data segment)
-            \item init systemcall number (11)
-            \item init systemcall argument (address of /bin//sh)
+            \item init systemcall number (11 in eax)
+            \item init systemcall arguments (address of /bin//sh in ebx, args and env in ecx and edx)
             \item call systemcall
         \end{enumerate}
         \item All of this has to be done using Bytes that are not \Verb+\\0x00+ because thats the character used for identifying the end of a string.

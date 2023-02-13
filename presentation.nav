@@ -36,48 +36,41 @@
 \headcommand {\beamer@framepages {11}{11}}
 \headcommand {\beamer@sectionpages {5}{11}}
 \headcommand {\beamer@subsectionpages {11}{11}}
-\headcommand {\sectionentry {3}{How to find suitable Gadgets?}{12}{How to find suitable Gadgets?}{0}}
+\headcommand {\sectionentry {3}{Example: Open a shell}{12}{Example: Open a shell}{0}}
 \headcommand {\slideentry {3}{0}{1}{12/12}{}{0}}
 \headcommand {\beamer@framepages {12}{12}}
-\headcommand {\slideentry {3}{0}{2}{13/13}{}{0}}
+\headcommand {\beamer@subsectionpages {12}{12}}
+\headcommand {\beamer@subsectionentry {0}{3}{1}{13}{Target Program and Compilation}}
+\headcommand {\slideentry {3}{1}{1}{13/13}{Target Program and Compilation}{0}}
 \headcommand {\beamer@framepages {13}{13}}
-\headcommand {\beamer@sectionpages {12}{13}}
-\headcommand {\beamer@subsectionpages {12}{13}}
-\headcommand {\sectionentry {4}{Example: Open a shell}{14}{Example: Open a shell}{0}}
-\headcommand {\slideentry {4}{0}{1}{14/14}{}{0}}
+\headcommand {\beamer@subsectionpages {13}{13}}
+\headcommand {\beamer@subsectionentry {0}{3}{2}{14}{General approach}}
+\headcommand {\slideentry {3}{2}{1}{14/14}{General approach}{0}}
 \headcommand {\beamer@framepages {14}{14}}
 \headcommand {\beamer@subsectionpages {14}{14}}
-\headcommand {\beamer@subsectionentry {0}{4}{1}{15}{Target Program and Compilation}}
-\headcommand {\slideentry {4}{1}{1}{15/15}{Target Program and Compilation}{0}}
+\headcommand {\beamer@subsectionentry {0}{3}{3}{15}{Generating the payload}}
+\headcommand {\slideentry {3}{3}{1}{15/15}{Generating the payload}{0}}
 \headcommand {\beamer@framepages {15}{15}}
-\headcommand {\beamer@subsectionpages {15}{15}}
-\headcommand {\beamer@subsectionentry {0}{4}{2}{16}{General approach}}
-\headcommand {\slideentry {4}{2}{1}{16/16}{General approach}{0}}
+\headcommand {\slideentry {3}{3}{2}{16/16}{Generating the payload}{0}}
 \headcommand {\beamer@framepages {16}{16}}
-\headcommand {\beamer@subsectionpages {16}{16}}
-\headcommand {\beamer@subsectionentry {0}{4}{3}{17}{Generating the payload}}
-\headcommand {\slideentry {4}{3}{1}{17/17}{Generating the payload}{0}}
+\headcommand {\slideentry {3}{3}{3}{17/17}{Generating the payload}{0}}
 \headcommand {\beamer@framepages {17}{17}}
-\headcommand {\slideentry {4}{3}{2}{18/18}{Generating the payload}{0}}
+\headcommand {\slideentry {3}{3}{4}{18/18}{Generating the payload}{0}}
 \headcommand {\beamer@framepages {18}{18}}
-\headcommand {\slideentry {4}{3}{3}{19/19}{Generating the payload}{0}}
+\headcommand {\beamer@sectionpages {12}{18}}
+\headcommand {\beamer@subsectionpages {15}{18}}
+\headcommand {\sectionentry {4}{Conclusion}{19}{Conclusion}{0}}
+\headcommand {\slideentry {4}{0}{1}{19/19}{}{0}}
 \headcommand {\beamer@framepages {19}{19}}
-\headcommand {\slideentry {4}{3}{4}{20/20}{Generating the payload}{0}}
+\headcommand {\slideentry {4}{0}{2}{20/20}{}{0}}
 \headcommand {\beamer@framepages {20}{20}}
-\headcommand {\beamer@sectionpages {14}{20}}
-\headcommand {\beamer@subsectionpages {17}{20}}
-\headcommand {\sectionentry {5}{Conclusion}{21}{Conclusion}{0}}
+\headcommand {\beamer@sectionpages {19}{20}}
+\headcommand {\beamer@subsectionpages {19}{20}}
+\headcommand {\sectionentry {5}{Sources}{21}{Sources}{0}}
 \headcommand {\slideentry {5}{0}{1}{21/21}{}{0}}
 \headcommand {\beamer@framepages {21}{21}}
-\headcommand {\slideentry {5}{0}{2}{22/22}{}{0}}
-\headcommand {\beamer@framepages {22}{22}}
-\headcommand {\beamer@sectionpages {21}{22}}
-\headcommand {\beamer@subsectionpages {21}{22}}
-\headcommand {\sectionentry {6}{Sources}{23}{Sources}{0}}
-\headcommand {\slideentry {6}{0}{1}{23/23}{}{0}}
-\headcommand {\beamer@framepages {23}{23}}
-\headcommand {\beamer@partpages {1}{23}}
-\headcommand {\beamer@subsectionpages {23}{23}}
-\headcommand {\beamer@sectionpages {23}{23}}
-\headcommand {\beamer@documentpages {23}}
-\headcommand {\gdef \inserttotalframenumber {23}}
+\headcommand {\beamer@partpages {1}{21}}
+\headcommand {\beamer@subsectionpages {21}{21}}
+\headcommand {\beamer@sectionpages {21}{21}}
+\headcommand {\beamer@documentpages {21}}
+\headcommand {\gdef \inserttotalframenumber {21}}
