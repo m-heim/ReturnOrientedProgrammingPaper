@@ -1,0 +1,4 @@
+0x08059ee3 : mov word ptr [edx], ax ; mov eax, edx ; ret
+0x08071e4e : mov esp, 0xc70cec83 ; ret 0xffe0
+0x0807faa3 : sti ; xor eax, eax ; ret
+0x0808b285 : pop edx ; xor eax, eax ; pop edi ; ret

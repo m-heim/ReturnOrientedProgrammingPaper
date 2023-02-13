@@ -3,7 +3,10 @@
 
 int main(int argc, char *argv[]) {
   char buffer[8] = {0};
-  printf("Please enter your name:");
-  scanf("%s", buffer);
+  if (argc != 2) {
+    printf("A single argument is required.\n");
+    return 1;
+  }
+  strcpy(buffer, argv[1]);
   return 0;
 }
