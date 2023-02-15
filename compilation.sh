@@ -1,1 +1,1 @@
-gcc -o vuln -g -m32 -D_FORTIFY_SOURCE=0 -fno-pie -fno-stack-protector -static vuln.c
+clang -o vuln vuln.c -m32 -fno-stack-protector  -Wl,-z,relro,-z,now,-z,noexecstack -static
