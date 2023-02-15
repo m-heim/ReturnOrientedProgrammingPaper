@@ -145,7 +145,7 @@ As described above you should
 \paragraph{Attack}
 After injecting the generated payload from \cref{sec:attack} as a command line argument the program opened a shell from which we can use privilege escalation techniques in order to completely compromise the system. The only compiler options that had to be activated were PIE and stack canaries. It is likely that there are systems still in use today which are vulnerable to this kind of attack. Since it allows almost arbitrary code execution it is very important to identify these devices and patch or replace them.
 \paragraph{ASLR}
-The information about wether or not ROP can be applied to systems with ASLR enabled is inconsistent. In the run with PIE and stack canaries disabled the attack still worked even with \Verb+/proc/sys/kernel/randomize_va_space+ set to \Verb+2+, meaning full randomization of the different segments like header, libraries and stack. This is probably
+The information about wether or not ROP can be applied to systems with ASLR enabled is inconsistent. In the run with PIE and stack canaries disabled the attack still worked even with \Verb+/proc/sys/kernel/randomize_va_space+ set to \Verb+2+, meaning full randomization of the different segments like header, libraries and stack. This is probably due to PIE
 \section{Protection}
 Luckily we had to disable several security mechanisms to make this attack possible, especially 
 
