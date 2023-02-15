@@ -11,6 +11,7 @@ The credits for the work provided in the settings and iacrtrans files is the wor
 ### General
 https://en.wikipedia.org/wiki/Return-oriented_programming (Basic introduction)
 https://codearcana.com/posts/2013/05/28/introduction-to-return-oriented-programming-rop.html (Basic introduction)
+- https://en.hackndo.com/return-oriented-programming/
 ### Research
 - https://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.216.778&rep=rep1&type=pdf (Return-Oriented Programming:
 Systems, Languages, and Applications)
