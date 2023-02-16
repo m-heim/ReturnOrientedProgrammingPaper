@@ -104,8 +104,14 @@ The following graphic~\cref{fig:stack} is an illustration of how the stack chang
   \caption{The stack when injecting the payload}
   \label{fig:stack}
 \end{figure}
-\subsection{ROP Chain}
-
+\subsection{ROP Runtime Behaviour}
+The following graphic~\cref{fig:executionatruntime} illustrates how the gadgets get executed once the instruction pointer \bltInlineVerb{eip} points to the ret in main.
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.95\textwidth]{Ropchaineffect.png}
+  \caption{The stack when injecting the payload}
+  \label{fig:executionatruntime}
+\end{figure}
 \section{Attack}
 \label{sec:attack}
 \subsection{Target Program}
