@@ -1,2 +1,22 @@
-@misc{pixis, title={Rop - Return Oriented Programming}, url={https://en.hackndo.com/return-oriented-programming/}, journal={hackndo}, publisher={Pixis}, author={Pixis}, year={2016}, month={Oct}}
-@misc{el-sherei, title={Return oriented programming (ROP FTW) - exploit-db.com}, url={https://www.exploit-db.com/docs/english/28479-return-oriented-programming-(rop-ftw).pdf}, journal={Return-Oriented-Programming (ROP FTW)}, author={El-Sherei, Saif}} 
+@misc{pixis, title={Rop - Return Oriented Programming}, howpublished="\url{https://en.hackndo.com/return-oriented-programming/}", journal={hackndo}, publisher={Pixis}, author={Pixis}, year={2016}, month={Oct}}
+@misc{el-sherei, title={Return oriented programming (ROP FTW) - exploit-db.com}, howpublished="\url{https://www.exploit-db.com/docs/english/28479-return-oriented-programming-(rop-ftw).pdf}", journal={Return-Oriented-Programming (ROP FTW)}, author={El-Sherei, Saif}}
+@misc{proggen-rop, title={Return-oriented Programming (ROP)}, howpublished="\url{https://www.proggen.org/doku.php?id=security%3Amemory-corruption%3Aexploitation%3Arop}", journal={Return-oriented Programming (ROP) - Raum für Ideen}} 
+@article{ropsla,
+author = {Roemer, Ryan and Buchanan, Erik and Shacham, Hovav and Savage, Stefan},
+title = {Return-Oriented Programming: Systems, Languages, and Applications},
+year = {2012},
+issue_date = {March 2012},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+volume = {15},
+number = {1},
+issn = {1094-9224},
+url = {https://doi.org/10.1145/2133375.2133377},
+doi = {10.1145/2133375.2133377},
+abstract = {We introduce return-oriented programming, a technique by which an attacker can induce arbitrary behavior in a program whose control flow he has diverted, without injecting any code. A return-oriented program chains together short instruction sequences already present in a program’s address space, each of which ends in a “return” instruction.Return-oriented programming defeats the W⊕X protections recently deployed by Microsoft, Intel, and AMD; in this context, it can be seen as a generalization of traditional return-into-libc attacks. But the threat is more general. Return-oriented programming is readily exploitable on multiple architectures and systems. It also bypasses an entire category of security measures---those that seek to prevent malicious computation by preventing the execution of malicious code.To demonstrate the wide applicability of return-oriented programming, we construct a Turing-complete set of building blocks called gadgets using the standard C libraries of two very different architectures: Linux/x86 and Solaris/SPARC. To demonstrate the power of return-oriented programming, we present a high-level, general-purpose language for describing return-oriented exploits and a compiler that translates it to gadgets.},
+journal = {ACM Trans. Inf. Syst. Secur.},
+month = {mar},
+articleno = {2},
+numpages = {34},
+keywords = {control flow integrity, return-into-libc, Return-oriented programming, attacks, RISC, W-xor-X, SPARC, memory safety, x86, NX}
+}

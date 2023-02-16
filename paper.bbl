@@ -1,11 +1,24 @@
-\begin{thebibliography}{Pix16}
+\begin{thebibliography}{RBSS12}
 
 \bibitem[ES]{el-sherei}
 Saif El-Sherei.
 \newblock Return oriented programming (rop ftw) - exploit-db.com.
+\newblock
+  \url{https://www.exploit-db.com/docs/english/28479-return-oriented-programming-(rop-ftw).pdf}.
 
 \bibitem[Pix16]{pixis}
 Pixis.
-\newblock Rop - return oriented programming, Oct 2016.
+\newblock Rop - return oriented programming.
+\newblock \url{https://en.hackndo.com/return-oriented-programming/}, Oct 2016.
+
+\bibitem[pro]{proggen-rop}
+Return-oriented programming (rop).
+\newblock
+  \url{https://www.proggen.org/doku.php?id=security%3Amemory-corruption%3Aexploitation%3Arop}.
+
+\bibitem[RBSS12]{ropsla}
+Ryan Roemer, Erik Buchanan, Hovav Shacham, and Stefan Savage.
+\newblock Return-oriented programming: Systems, languages, and applications.
+\newblock {\em ACM Trans. Inf. Syst. Secur.}, 15(1), mar 2012.
 
 \end{thebibliography}
