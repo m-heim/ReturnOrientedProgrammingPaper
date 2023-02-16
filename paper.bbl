@@ -1,7 +1,11 @@
-\begin{thebibliography}{ES}
+\begin{thebibliography}{Pix16}
 
 \bibitem[ES]{el-sherei}
 Saif El-Sherei.
 \newblock Return oriented programming (rop ftw) - exploit-db.com.
+
+\bibitem[Pix16]{pixis}
+Pixis.
+\newblock Rop - return oriented programming, Oct 2016.
 
 \end{thebibliography}

@@ -100,7 +100,7 @@ for all of these regular expressions i was able to find at least a few suitable 
 The following graphic is an illustration of how the stack changes when injecting the payload. The buffer first has to be filled. In binary exploitation the letter \Verb+A+ is used for that most of the time, it has an easy to identify hexadecimal value of \bltInlineVerb{0x41}. It is important to note that without any special compiler options the stack will be aligned in \bltInlineVerb{dword}'s, because of that the buffer has to be filled with 16 Bytes instead of 8 Bytes, this can be turned off with the option \bltInlineVerb{-mpreferred-stack-boundary=2}. Though, then the payload only worked when filling the buffer with 24 Bytes.
 \begin{figure}[h]
   \centering
-  \includegraphics[width=0.65\textwidth]{stackropoffsec.png}
+  \includegraphics[width=0.79\textwidth]{stackropoffsec.png}
   \caption{The stack when injecting the payload}
   \label{fig:mesh1}
 \end{figure}
@@ -129,18 +129,20 @@ The attack consists of several phases
   \item Insert payload into target using a vulnerability
 \end{enumerate}
 \paragraph{Goal and abstract payload}
-After specifying the goal and possibly simplifying it we have to write a list of instructions and arguments that achieve the goal, for this its favorable to directly use the format of the final payload except for using instructions instead of addresses as this will then allow to simply insert the found gadgets into this abstract payload. For the example in this paper we want to open a shell, for that the simplest way is to execute an execve system call. The following program state~\cref{fig:stateforint} has to be achieved so the interrupt \bltInlineVerb{int 0x80} causes a shell to be opened.
+After specifying the goal and possibly simplifying it we have to write a list of instructions and arguments that achieve the goal, for this its favorable to directly use the format of the final payload except for using instructions instead of addresses as this will then allow to simply insert the found gadgets into this abstract payload. For the example in this paper we want to open a shell, for that the simplest way is to execute an execve system call. The following program state~\cref{fig:stateforint} has to be achieved so the interrupt \bltInlineVerb{int 0x80} causes a shell to be opened.~\cite{pixis}
 \begin{figure}[h]
   \centering
-  \includegraphics[width=0.95\textwidth]{Stateforexecve.png}
-  \caption{Required program state for the execve syscall}
+  \includegraphics[width=0.95\textwidth]{requirementstackmemory.png}
+  \caption{Required Program State for the execve Syscall}
   \label{fig:stateforint}
 \end{figure}
 \paragraph{Extract and search gadgets}
-\paragraph{Determining the padding}
+\paragraph{Determine the padding}
 Compilers optimize stack alignment and without providing options to change that the simplest way to determine the padding required is to test the program until it crashes with a payload increasing by 1 word in each iteration. This can be automated in a Python script~\cref{code:determinewordcount}. This script applies the method mentioned above with the \bltInlineVerb{os.system} function. The return value of that function is the exit code of the program that has been executed and is either \Verb+0+ when the execution ended without any errors and non \Verb+0+ when an error or exception occured during startup or runtime. This means we can increase the input by \bltInlineVerb{"AAAA"} in each iteration until the return value is non zero. At this point the base pointer \bltInlineVerb{ebp} has been overridden causing the program to crash. Now reducing the padding by 1 word results in the correct amount.
 \bltCode{determinewordcount.py}{python}{A Python Script to Determine the Required Words}{code:determinewordcount}
-we have overwritten the return instruction pointer with \bltInlineVerb{"BBBB"}. Reducing the amount of \Verb+A+'s by 4 the first gadget overrides the return address of the function call and on \Verb+ret+ the execution gets redirected to the first gadget.
+\paragraph{Determine the address of a writable segment}
+There segments in a binary can be read only or writable. It is possible to determine wether a segment is read only with \bltInlineVerb{objdump -h}. However, the following~\cref{command:finddatasegment} bash command can be used to find the address of the data segment.
+\bltCommand{objdump.sh}{Determine the Address of .data}{command:finddatasegment}
 \paragraph{struct.pack}
 \Verb+struct.pack+ is a Python function that allows to easily generate our desired payload from the raw bytes. Bash then allows to directly pipe the generated payload into our target. In order to generate the payload we first have to fill the buffer and override the EBP with arbitary values as seen in line 2~\cref{howtopack}. This is usually done using easily recognizable characters, using the letter \Verb+A+ for this is common. It has the hex value \Verb+0x41+, doing this allows then to spot the buffer in a debugger like \Verb+gdb+. So in this example we fill the buffer with 8 \Verb+A+'s and 4 \Verb+B+'s. After that it is time to insert the addresses of the gadgets and the arguments. This is done by calling pack with the double word (64 Bit) while specifying the endianness, converting that to a string and adding it to the string as seen in line 3~\cref{howtopack}. After the whole payload has been generated we can print it and use the output directly for running the buffer overflow attack as mentioned above.
 \bltCode{pack.py}{python}{How to use struct.pack}{howtopack}

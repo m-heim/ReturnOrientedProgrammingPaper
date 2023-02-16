@@ -1,0 +1,1 @@
+objdump -h ./vuln | grep "\\.data "
