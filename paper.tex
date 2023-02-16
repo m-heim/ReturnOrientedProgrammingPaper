@@ -68,6 +68,7 @@ On the x86 architecture the \Verb+ret+ instruction is defined to pop the return 
 Gadgets are code segments that sit before a \Verb+ret+ instruction, these assembly instructions can be chained arbitrarily
 
 \paragraph{How to find Gadgets}
+\label{par:ropgadget}
 A gadget can be found by searching for \Verb+0xC3+ Bytes in the program. The instructions before then represent the code we can use, for that we need the address of the gadget. It is possible this manually using tools like \Verb+objdump+, \Verb+hexdump+ or use one of the many tools available, to name a few there is \Verb+ropper+, \Verb+ROPgadget+ and \Verb+pwntools+. For this paper i will be using \Verb+ROPgadget+ since i found it easy to use and fast. \Verb+ROPgadget+ can be found in most package managers or can be downloaded directly from \url{https://github.com/JonathanSalwan/ROPgadget}. The gadgets can be extracted from the file using the following command~\cref{dumpallgadgets}. We can then use regular expressions to search for the gadgets that we need.
 \bltCommand{ropcommand.sh}{Exporting gadgets with ROPgadget}{dumpallgadgets}
 This command produces an output with results similar to this.
@@ -96,6 +97,7 @@ for all of these regular expressions i was able to find at least a few suitable 
 
 \section{Theory}
 \subsection{Stack}
+The following graphic is an illustration of how the stack changes when injecting the payload. The buffer first has to be filled. In binary exploitation the letter \Verb+A+ is used for that most of the time, it has an easy to identify hexadecimal value of \bltInlineVerb{0x41}. It is important to note that without any special compiler options the stack will be aligned in \bltInlineVerb{dword}'s, because of that the buffer has to be filled with 16 Bytes instead of 8 Bytes, this can be turned off with the option \bltInlineVerb{-mpreferred-stack-boundary=2}. Though, then the payload only worked when filling the buffer with 24 Bytes.
 \begin{figure}[h]
   \centering
   \includegraphics[width=0.65\textwidth]{stackropoffsec.png}
@@ -117,9 +119,9 @@ We compile the target program with the following command. There are several impo
 \paragraph{Phases}
 The attack consists of several phases
 \begin{enumerate}
-  \item Specify concrete goal with required program state and instructions
-  \item Generate desired list of instructions and arguments (abstract payload)
-  \item Extract gadgets using tools
+  \item Specify goal with required program state and instructions
+  \item Generate desired list of instructions and arguments (abstract payload/rop chain)
+  \item Extract gadgets using tools, e.g. ROPgadget~\cref{par:ropgadget}
   \item Search gadgets for instructions
   \item Generate payload using the gadgets according to the the abstract payload while making sure gadgets dont interfere with our desired program state. This step can be done using Python which we will show in a later section~\cref{howtopack}
   \item Insert payload into target
@@ -148,7 +150,7 @@ Sources:
 \bltInlineVerb{https://guyinatuxedo.github.io/5.1-mitigation_aslr_pie/index.html}
 %%%% 8. BILBIOGRAPHY %%%%
 \bibliographystyle{alpha}
-\bibliography{abbrev3,crypto,biblio}
+\bibliography{refs}
 %%%% NOTES
 % - Download abbrev3.bib and crypto.bib from https://cryptobib.di.ens.fr/
 % - Use bilbio.bib for additional references not in the cryptobib database.
