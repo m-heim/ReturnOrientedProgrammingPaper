@@ -98,7 +98,7 @@ for all of these regular expressions there were gadgets for the given program in
 \section{Theory}
 \subsection{Stack}
 The following graphic~\cref{fig:stack} is an illustration of how the stack changes when injecting the payload. The buffer first has to be filled. In binary exploitation the letter \Verb+A+ is used for that most of the time, it has an easy to identify hexadecimal value of \bltInlineVerb{0x41}. It is important to note that without any special compiler options the stack will be aligned in \bltInlineVerb{dword}'s, because of that the buffer has to be filled with 16 Bytes instead of 8 Bytes, this can be turned off with the option \bltInlineVerb{-mpreferred-stack-boundary=2}. Though, then the payload only worked when filling the buffer with 24 Bytes.
-\begin{figure}[h]
+\begin{figure}[h!]
   \centering
   \includegraphics[width=0.79\textwidth]{stackropoffsec.png}
   \caption{The stack when injecting the payload}
@@ -106,7 +106,7 @@ The following graphic~\cref{fig:stack} is an illustration of how the stack chang
 \end{figure}
 \subsection{ROP Runtime Behaviour}
 The following graphic~\cref{fig:executionatruntime} illustrates how the gadgets get executed once the instruction pointer \bltInlineVerb{eip} points to the ret in main.
-\begin{figure}[h]
+\begin{figure}[h!]
   \centering
   \includegraphics[width=0.95\textwidth]{Ropchaineffect.png}
   \caption{The stack when injecting the payload}
@@ -129,7 +129,7 @@ The attack consists of several phases
   \item Generate desired list of instructions and arguments (abstract payload/rop chain)
   \item Extract gadgets using tools, e.g. ROPgadget~\cref{par:ropgadget}
   \item Search gadgets for instructions
-  \item Determine how many bytes are needed to override the base pointer \Verb+ebp+
+  \item Determine how many words are needed to override the base pointer \Verb+ebp+
   \item Determine position of a writable data segment
   \item Generate payload using the gadgets according to the the abstract payload while making sure gadgets dont interfere with our desired program state. This step can be done using Python which we will show in a later section~\cref{howtopack}
   \item Insert payload into target using a vulnerability
@@ -152,7 +152,9 @@ There segments in a binary can be read only or writable. It is possible to deter
 \paragraph{struct.pack}
 \Verb+struct.pack+ is a Python function that allows to easily generate our desired payload from the raw bytes. Bash then allows to directly pipe the generated payload into our target. In order to generate the payload we first have to fill the buffer and override the EBP with arbitary values as seen in line 2~\cref{howtopack}. This is usually done using easily recognizable characters, using the letter \Verb+A+ for this is common. It has the hex value \Verb+0x41+, doing this allows then to spot the buffer in a debugger like \Verb+gdb+. So in this example we fill the buffer with 8 \Verb+A+'s and 4 \Verb+B+'s. After that it is time to insert the addresses of the gadgets and the arguments. This is done by calling pack with the double word (64 Bit) while specifying the endianness, converting that to a string and adding it to the string as seen in line 3~\cref{howtopack}. After the whole payload has been generated we can print it and use the output directly for running the buffer overflow attack as mentioned above.
 \bltCode{pack.py}{python}{How to use struct.pack}{howtopack}
-
+\subsection{Payload}
+From all the previous steps the payload got constructed using python~\cref{code:payloadbinsh}.
+\bltCode{payload.py}{python}{Payload to open /bin/sh}{code:payloadbinsh}
 \section{Results}
 \paragraph{Attack}
 After injecting the generated payload from \cref{sec:attack} as a command line argument the program opened a shell from which we can use privilege escalation techniques in order to completely compromise the system. The only compiler options that had to be activated were PIE and stack canaries. It is likely that there are systems still in use today which are vulnerable to this kind of attack. Since it allows almost arbitrary code execution it is very important to identify these devices and patch or replace them.
@@ -160,7 +162,12 @@ After injecting the generated payload from \cref{sec:attack} as a command line a
 The information about wether or not ROP can be applied to systems with ASLR enabled is inconsistent. In the run with PIE and stack canaries disabled the attack still worked even with \Verb+/proc/sys/kernel/randomize_va_space+ set to \Verb+2+, meaning full randomization of the different segments like header, libraries and stack. This is probably due to PIE
 
 \section{Protection}
-Luckily we had to disable several security mechanisms to make this attack possible, especially 
+\paragraph{Stack canaries}
+Stack canaries are one of the most effective approaches against ROP, they are enabled by default and prevent most forms of buffer overflows, however, stack canaries can be based on a small entropy pool and can therfore be bruteforced with an effort significantly smaller than regular bruteforcing. Depending on the target it can still be profitable and possible to bruteforce it even with a big entropy pool and high randomness.
+\paragraph{NX}
+The activation of the NX bit has no effect on ROP since the program never executes code outside the segments marked with the \bltInlineVerb{CODE} flag like in a classical stack overflow attack.
+\paragraph{ASLR}
+\paragraph{PIE}
 
 \section{Discussion}
 Sources:
