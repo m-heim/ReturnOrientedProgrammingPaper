@@ -1,1 +1,1 @@
-clang -o vuln vuln.c -m32 -g -fno-stack-protector -fno-pie -static
+clang -o vuln vuln.c -m32 -g -fno-stack-protector -static
