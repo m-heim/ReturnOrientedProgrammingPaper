@@ -51,13 +51,14 @@
 
 %%%% 6. ABSTRACT %%%%
 \begin{abstract}
-  Return Oriented Programming is a buffer overflow exploitation technique developed in 2007. Under certain circumstances it can provide arbitrary code execution on assembly level. Luckily the development of binary exploitation protections like stack canaries, bounds checking and ASLR made the effort required for developing an attack for that specific target and attacking the target too high to make it practicable in most cases, however, old soft-/hardware are still vulnerable and the mentioned protections have shown to be vulnerable themselves, with high enough reward ROP may be a devastating technique for black-hats.  
+  In this paper we introduce the concept, demonstrate an attack and talk about the different protection mechanisms of Return Oriented Programming. ROP is a buffer overflow exploitation technique developed in 2007. Under certain circumstances it can provide arbitrary code execution on assembly level. Modern 64 Bit binaries are decently secure against ROP with ASLR and stack protections enabled. 32 Bit binaries or binaries compiled for non PC systems may not provide the same protection though and may be vulnerable to ROP.
 \end{abstract}
 
+\section{Introduction}
 
 %%%% 7. PAPER CONTENT %%%%
 \section{Introduction}
-Return Oriented Programming, abbreviated ROP is a type of buffer overflow attack that has been published in 2007 by Hovav Shacham.~\cite{ropfirstpaper} and has become a widely known buffer overflow technique since. It has been developed to circumvent the NX-BIT protection that protects the stack from being executed. At the time of writing this paper modern techniques like stack carnaries and ASLR make these attacks hard and very time consuming on modern systems. That is not to say ASLR and stack canaries can not be broken by bruteforcing or side channels. Since there are millions of running systems with old hard-, firm- and software that is possibly vulnerable to these kinds of attacks it is still relevant to this day. The main idea in ROP is based on chaining return addresses to code just before a return and therefore allowing almost arbitrary cpu instructions to be chained.
+Return Oriented Programming, abbreviated ROP is a type of buffer overflow attack that has been published in 2007 by Hovav Shacham.~\cite{ropfirstpaper} and has become a widely known buffer overflow technique since. It has been developed to circumvent the NX-BIT protection that protects the stack from being executed. The general consensus is that modern binaries are practically not vulnerable to buffer overflow attacks, but there is a lot of research surrounding breaking of these security measures that shows practical strength of these security measures does not equal the theoretical strength due to side channels, bugs or other exploits.~\cite{aslr} With high enough reward ROP may be a devastating technique for black-hats, because of that it is important to raise awareness about binary exploitation generally and ROP. Because of that this paper will demonstrate the underlying theory and demonstrate it with an attack on a vulnerable binary.
 
 
 \section{Gadgets}
@@ -69,7 +70,7 @@ On the x86 architecture the \Verb+ret+ instruction is defined to pop the return 
 \label{par:ropgadget}
 A gadget can be found by searching for \Verb+0xC3+ Bytes in the program. The instructions before then represent the code code that can be executed by injecting the addresses of these instructions. It is possible to search for gadgets with \Verb+objdump+ or \Verb+hexdump+, however, the tools specifically made for finding ROP gadgets are really easy to use and provide lots of customizability and features for finding the required gadgets. To name a few ROP gadget tools there is \Verb+ropper+, \Verb+ROPgadget+ and \Verb+pwntools+. For this paper the software \Verb+ROPgadget+ has been employed since i found it easy to use. \bltInlineVerb{ROPgadget} can be found in most package managers or can be downloaded directly from \url{https://github.com/JonathanSalwan/ROPgadget}. The gadgets can be extracted from the file with the following command~\cref{dumpallgadgets}. We can then use regular expressions or ROPgadget directly to search for the required gadgets.
 \bltCommand{ropcommand.sh}{Exporting gadgets with ROPgadget}{dumpallgadgets}
-This command produces an output with results similar to this.
+This command produces an output with results similar to this~\cref{outputropgadget}.
 \bltResult{dumppick}{Output of ROPgadget}{outputropgadget}
 These are only 10 Lines out of the 8244 lines found by the tool though and i purposefully filtered out some good and bad ones for demonstration. It is clearly visible that many candidates for ROP can be found, even in a file with a relatively small size of 72 kB. Though most of these gadgets are not all that useful because they often modify a lot of registers, possibly messing up the desired state. In most cases we can find suitable candidates using regular expressions, this will be demonstrated later in this section~\cref{subsec:filtering}.
 \paragraph{Overview of powerful gadgets}
@@ -97,13 +98,13 @@ for all of these regular expressions there were gadgets for the given program in
 \section{Theory}
 \subsection{Stack}
 The following graphic~\cref{fig:stack} is an illustration of how the stack changes when injecting the payload. The buffer first has to be filled. In binary exploitation the letter \Verb+A+ is used for that most of the time, it has an easy to identify hexadecimal value of \bltInlineVerb{0x41}. It is important to note that without any special compiler options the stack will be aligned in \bltInlineVerb{dword}'s/16 Byte blocks. because of that the buffer has to be filled with more bytes than the buffer holds if $s \mod 16 \neq 0$ holds true, s being the buffer size in Bytes.
-\newpage
 \begin{figure}[h!]
   \centering
   \includegraphics[width=0.79\textwidth]{stackropoffsec.png}
   \caption{The stack when injecting the payload}
   \label{fig:stack}
 \end{figure}
+\\
 \subsection{ROP Runtime Behaviour}
 The following graphic~\cref{fig:executionatruntime} illustrates how the gadgets get executed once the instruction pointer \bltInlineVerb{eip} points to the \bltInlineVerb{ret} in \bltInlineVerb{main}. Once this happens the execution gets redirected to the first gadget and executes the instructions in it. As soon as \bltInlineVerb{eip} points to the \bltInlineVerb{ret} in the 1st gadget the address of the 2nd gadget is \bltInlineVerb{pop}'d into \bltInlineVerb{eip} and execution continues there, from there the same thing happens again until execution reaches the end of the last gadget.
 \begin{figure}[h!]
@@ -112,7 +113,8 @@ The following graphic~\cref{fig:executionatruntime} illustrates how the gadgets 
   \caption{The stack when injecting the payload}
   \label{fig:executionatruntime}
 \end{figure}
-\section{Attack}
+
+\section{Attack: Opening a Shell}
 \label{sec:attack}
 \subsection{Target Program}
 \paragraph{Target Program}
@@ -122,7 +124,6 @@ The following program is the target of our attack, it uses a command line argume
 We compile the target program with the following command. There are several important options given in this command. Most importantly the \bltInlineVerb{-fno-stack-protector} option disables stack canaries which would otherwise directly terminate the program when the canary is overwritten. The \Verb+-m32+ option compiles the binary as a 32 Bit executable, this makes the attack easier. The \Verb+-static+ option makes the binary statically linked. Without this option there are only 50 gadgets available, considering most of them are not useful for our attack it is practically impossible to perform the attack with just these gadgets. The \Verb+-static+ option includes the \Verb+libc+ library in the executable, increasing the gadget count to over 8000. However, it is possible to determine the address of the dynamically linked library at runtime and adding an offset for each gadget to this address. This has been described by Saif El-Sherei~\cite{el-sherei} but will not be further discussed in this paper.
 \bltCommand{compilation.sh}{The compliation command}{thecompilationcommand}
 \subsection{Phases of developing the attack}
-\paragraph{Phases}
 The attack consists of several phases
 \begin{enumerate}
   \item Specify attack, analyze necessary setup to be done.~\cref{par:goal}
@@ -132,7 +133,7 @@ The attack consists of several phases
   \item Generate payload with the extracted gadgets based on the specification in step 1.~\cref{par:genthepayload}
   \item Insert payload into target using a vulnerability~\cref{par:injthepayload}
 \end{enumerate}
-\subsection{The attack}
+\subsection{Opening a Shell}
 \paragraph{Specification and abstract payload}
 \label{par:goal}
 After specifying the goal and possibly simplifying it we have to determine the required program state. For the example in this paper we want to open a shell, for that the simplest way is to execute an \bltInlineVerb{execve} system call. The following program state~\cref{fig:stateforint} has to be achieved so the interrupt \bltInlineVerb{int 0x80} causes a shell to be opened.~\cite{pixis}~\cite{proggen-rop}
@@ -150,7 +151,7 @@ Compilers optimize stack alignment and without providing options to change that 
 \bltCode{determinewordcount.py}{python}{A Python Script to Determine the Required Words}{code:determinewordcount}
 \paragraph{Determine the address of a writable segment}
 \label{par:data}
-The segments in a binary can be read only or writable. It is possible to determine wether a segment is read only with \bltInlineVerb{objdump -h}. However, the following~\cref{command:finddatasegment} bash command can be used to find the address of the data segment. The data segment contains static and global variables. Since the target program does not have any global or static variables we can override this segment with arbitrary character sequences. In 
+The segments in a binary can be read only or writable. It is possible to determine wether a segment is read only with \bltInlineVerb{objdump -h}. However, the following~\cref{command:finddatasegment} bash command can be used to find the address of the data segment. The data segment contains static and global variables. Since the target program does not have any global or static variables we can override this segment with arbitrary character sequences.
 \bltCommand{objdump.sh}{Determine the Address of .data}{command:finddatasegment}
 \paragraph{Generating the payload}
 \label{par:genthepayload}
