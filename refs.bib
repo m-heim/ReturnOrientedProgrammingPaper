@@ -3,7 +3,7 @@
 @misc{proggen-rop, title={Return-oriented Programming (ROP)}, howpublished="\url{https://www.proggen.org/doku.php?id=security%3Amemory-corruption%3Aexploitation%3Arop}", journal={Return-oriented Programming (ROP) - Raum für Ideen}}
 @misc{rny, howpublished="\url{https://renenyffenegger.ch/notes/Linux/fhs/proc/sys/kernel/randomize_va_space}", journal={/proc/sys/kernel/randomize_va_space}, author={Nyffenegger, Rene}}
 @misc{retx86, title={X86 instruction set reference - Return from Procedure}, howpublished="\url{https://c9x.me/x86/html/file_module_x86_id_280.html}", journal={War on Theism: x86 Instruction Set Reference}} 
-@inproceedings{hshacham,
+@inproceedings{ropfirstpaper,
 author = {Shacham, Hovav},
 title = {The Geometry of Innocent Flesh on the Bone: Return-into-Libc without Function Calls (on the X86)},
 year = {2007},
@@ -19,6 +19,23 @@ numpages = {10},
 keywords = {turing completeness, instruction set, return-into-libc},
 location = {Alexandria, Virginia, USA},
 series = {CCS '07}
+}
+@inproceedings{aslr,
+author = {Shacham, Hovav and Page, Matthew and Pfaff, Ben and Goh, Eu-Jin and Modadugu, Nagendra and Boneh, Dan},
+title = {On the Effectiveness of Address-Space Randomization},
+year = {2004},
+isbn = {1581139616},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+url = {https://doi.org/10.1145/1030083.1030124},
+doi = {10.1145/1030083.1030124},
+abstract = {Address-space randomization is a technique used to fortify systems against buffer overflow attacks. The idea is to introduce artificial diversity by randomizing the memory location of certain system components. This mechanism is available for both Linux (via PaX ASLR) and OpenBSD. We study the effectiveness of address-space randomization and find that its utility on 32-bit architectures is limited by the number of bits available for address randomization. In particular, we demonstrate a <i>derandomization attack</i> that will convert any standard buffer-overflow exploit into an exploit that works against systems protected by address-space randomization. The resulting exploit is as effective as the original exploit, although it takes a little longer to compromise a target machine: on average 216 seconds to compromise Apache running on a Linux PaX ASLR system. The attack does not require running code on the stack.We also explore various ways of strengthening address-space randomization and point out weaknesses in each. Surprisingly, increasing the frequency of re-randomizations adds at most 1 bit of security. Furthermore, compile-time randomization appears to be more effective than runtime randomization. We conclude that, on 32-bit architectures, the only benefit of PaX-like address-space randomization is a small slowdown in worm propagation speed. The cost of randomization is extra complexity in system support.},
+booktitle = {Proceedings of the 11th ACM Conference on Computer and Communications Security},
+pages = {298–307},
+numpages = {10},
+keywords = {automated attacks, address-space randomization, diversity},
+location = {Washington DC, USA},
+series = {CCS '04}
 }
 @inproceedings{roperh,
 author = {Buchanan, Erik and Roemer, Ryan and Shacham, Hovav and Savage, Stefan},

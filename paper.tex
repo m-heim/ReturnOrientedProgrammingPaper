@@ -46,19 +46,18 @@
 
 
 %%%% 5. KEYWORDS %%%%
-\keywords{ROP \and Return Oriented Programming \and Buffer Overflow \and Binary Exploitation}
+\keywords{ROP \and Return Oriented Programming \and ret2libc \and ret2lib \and ROP-Gadget \and Stack Overflow \and Buffer Overflow \and Binary Exploitation \and Cyber Security \and ASLR \and Address Space Layout Randomization \and NX \and DEP}
 
 
 %%%% 6. ABSTRACT %%%%
 \begin{abstract}
-  In this paper we introduce the concept of Return Oriented Programming, how to apply it, how to protect against it and show a concrete attack.
+  Return Oriented Programming is a buffer overflow exploitation technique developed in 2007. Under certain circumstances it can provide arbitrary code execution on assembly level. Luckily the development of binary exploitation protections like stack canaries, bounds checking and ASLR made the effort required for developing an attack for that specific target and attacking the target too high to make it practicable in most cases, however, old soft-/hardware are still vulnerable and the mentioned protections have shown to be vulnerable themselves, with high enough reward ROP may be a devastating technique for black-hats.  
 \end{abstract}
 
 
 %%%% 7. PAPER CONTENT %%%%
 \section{Introduction}
-BIBLIOGRAFIE NICHT VERGESSEN
-Return Oriented Programming, abbreviated ROP is a type of buffer overflow attack that has been published in 2007 by Hovav Shacham~\cref{hshacham} and has become a widely known buffer overflow technique since. It has been developed to circumvent the NX-BIT protection that protects the stack from being executed. At the time of writing this paper modern techniques like stack carnaries and ASLR make these attacks hard and very time consuming on modern systems. That is not to say ASLR and stack canaries can not be broken by bruteforcing or side channels. Since there are millions of running systems with old hard-, firm- and software that is possibly vulnerable to these kinds of attacks it is still relevant to this day. The main idea in ROP is based on chaining return addresses to code just before a return and therefore allowing almost arbitrary cpu instructions to be chained.
+Return Oriented Programming, abbreviated ROP is a type of buffer overflow attack that has been published in 2007 by Hovav Shacham.~\cite{ropfirstpaper} and has become a widely known buffer overflow technique since. It has been developed to circumvent the NX-BIT protection that protects the stack from being executed. At the time of writing this paper modern techniques like stack carnaries and ASLR make these attacks hard and very time consuming on modern systems. That is not to say ASLR and stack canaries can not be broken by bruteforcing or side channels. Since there are millions of running systems with old hard-, firm- and software that is possibly vulnerable to these kinds of attacks it is still relevant to this day. The main idea in ROP is based on chaining return addresses to code just before a return and therefore allowing almost arbitrary cpu instructions to be chained.
 
 
 \section{Gadgets}
@@ -77,11 +76,11 @@ These are only 10 Lines out of the 8244 lines found by the tool though and i pur
 \paragraph{pop}
 \Verb+pop+ allows us to write arbitrary values into registers. For that we search for a \Verb+pop <reg>+ instruction inside our gadgets, in the payload we can then place the value that we want to insert after the address of the \Verb+pop+ instruction.~\cite{ropsla} If we can not find a suitable gadget we can try to get creative and achieve the desired state another way. For example if we want to modify \Verb+ecx+ but do not have a \Verb+pop ecx+ instruction available we could achieve it with something like this: \bltInlineVerb{xor ecx, ecx ; pop eax ; xor ecx, eax}. Provided that we have these gadgets available.
 \paragraph{mov}
-\Verb+mov+ allows us to write arbitrary values into memory. For that we search for a \Verb+mov dword ptr [<reg1>], <reg2>+ instruction inside our gadgets, we can then, in combination with two pops write arbitrary values at arbitary memory locations.~\cite{ropsla} The following example writes the value in \Verb+ecx+ to where \Verb+eax+ points to: \bltInlineVerb{pop ecx ; pop eax ; mov dword ptr [eax], ecx}
+\Verb+mov+ allows us to read from memory, copy values from register to register and write arbitrary values into memory. In order to read from memory we have to search for a \bltInlineVerb{mov dword ptr <reg1>, [<reg2>]} instruction, we can then specify the memory address to read from in \bltInlineVerb{reg2}. In order to copy a value from register to register we have to search for a \bltInlineVerb{mov <reg1>, <reg2>} gadget. In order to write to memory we have to search for a \bltInlineVerb{mov dword ptr [<reg1>], <reg2>} instruction inside our gadgets, we can then specify the value in \bltInlineVerb{reg2} and the address in \bltInlineVerb{reg1}, given there is a way to modify both registers.
 \paragraph{arithmetics, boolean algebra}
-Arithmetic operations like \Verb+add+, \Verb+sub+, \Verb+inc+, \Verb+xor+, \Verb+or+, and can be useful to bring registers into our desired state.~\cite{ropsla} For that we search for the corresponding gadget with the required operands. For example \Verb+xor+ can be used to clear a register or copy its contents. It often occurs in the following forms: \bltInlineVerb{xor eax, eax} or \bltInlineVerb{xor eax, edx}. The first case clears the register since \Verb+xor+ computes a non-equivalence, formally $a \oplus a = 0$ and the second one copies the value of the 2nd operand into the 1st operand when the target register is \Verb+0x00+ since \Verb+0x00+ is the neutral element of the \Verb+xor+ operation, formally $a \oplus 0 = a$.
+Arithmetic operations like \Verb+add+, \Verb+sub+, \Verb+inc+ and \Verb+xor+ can be useful to bring registers into our desired state.~\cite{ropsla} For that we search for the corresponding gadget with the required operands. For example \Verb+xor+ can be used to clear a register or copy its contents. It often occurs in the following forms: \bltInlineVerb{xor eax, eax} or \bltInlineVerb{xor eax, edx}. The first case clears the register since \Verb+xor+ computes a non-equivalence, formally $a \oplus a = 0$ and the second one copies the value of the 2nd operand into the 1st operand when the target register is \Verb+0x00+ since \Verb+0x00+ is the neutral element of the \Verb+xor+ operation, formally $a \oplus 0 = a$.
 \paragraph{int 0x80}
-\Verb+int+ stands for interrupt, the interrupt \bltInlineVerb{int 0x80} causes a system call to be executed. System calls are kernelspace programs/operations that require higher privileges than what is available in a userspace program. Examples for system calls include io and \Verb+execve+ which allows to execute arbitary programs. In combination with \Verb+pop+, \Verb+mov+ and other instructions we can specify the concrete system call.~\cite{ropsla} One of the most powerful system calls for blackhats is bash since it allows permanently implementing malware or gain insight into files, it can be called with the argument \Verb+/bin/sh+. This will be demonstrated in~\cref{sec:attack}
+\Verb+int+ stands for interrupt, the interrupt \bltInlineVerb{int 0x80} causes a system call to be executed. System calls are kernelspace programs/operations that require higher privileges than what is available in a userspace program. Examples for system calls include io and \Verb+execve+ which allows to execute arbitary programs. In combination with \Verb+pop+, \Verb+mov+ and other instructions we can specify the concrete system call.~\cite{ropsla} One of the most powerful system calls for blackhats is bash since it allows permanently implementing malware or gain insight into files, it can be called with the argument \Verb+/bin/sh+. This will be demonstrated in~\cref{sec:attack}.
 \subsection{Filtering the gadgets}
 \label{subsec:filtering}
 \paragraph{Introduction}
@@ -97,7 +96,8 @@ for all of these regular expressions there were gadgets for the given program in
 
 \section{Theory}
 \subsection{Stack}
-The following graphic~\cref{fig:stack} is an illustration of how the stack changes when injecting the payload. The buffer first has to be filled. In binary exploitation the letter \Verb+A+ is used for that most of the time, it has an easy to identify hexadecimal value of \bltInlineVerb{0x41}. It is important to note that without any special compiler options the stack will be aligned in \bltInlineVerb{dword}'s, because of that the buffer has to be filled with 16 Bytes instead of 8 Bytes, this can be turned off with the option \bltInlineVerb{-mpreferred-stack-boundary=2}. Surprisingly the payload then only worked when filling the buffer with 24 Bytes.
+The following graphic~\cref{fig:stack} is an illustration of how the stack changes when injecting the payload. The buffer first has to be filled. In binary exploitation the letter \Verb+A+ is used for that most of the time, it has an easy to identify hexadecimal value of \bltInlineVerb{0x41}. It is important to note that without any special compiler options the stack will be aligned in \bltInlineVerb{dword}'s/16 Byte blocks. because of that the buffer has to be filled with more bytes than the buffer holds if $s \mod 16 \neq 0$ holds true, s being the buffer size in Bytes.
+\newpage
 \begin{figure}[h!]
   \centering
   \includegraphics[width=0.79\textwidth]{stackropoffsec.png}
@@ -105,7 +105,7 @@ The following graphic~\cref{fig:stack} is an illustration of how the stack chang
   \label{fig:stack}
 \end{figure}
 \subsection{ROP Runtime Behaviour}
-The following graphic~\cref{fig:executionatruntime} illustrates how the gadgets get executed once the instruction pointer \bltInlineVerb{eip} points to the \bltInlineVerb{ret} in \bltInlineVerb{main}.
+The following graphic~\cref{fig:executionatruntime} illustrates how the gadgets get executed once the instruction pointer \bltInlineVerb{eip} points to the \bltInlineVerb{ret} in \bltInlineVerb{main}. Once this happens the execution gets redirected to the first gadget and executes the instructions in it. As soon as \bltInlineVerb{eip} points to the \bltInlineVerb{ret} in the 1st gadget the address of the 2nd gadget is \bltInlineVerb{pop}'d into \bltInlineVerb{eip} and execution continues there, from there the same thing happens again until execution reaches the end of the last gadget.
 \begin{figure}[h!]
   \centering
   \includegraphics[width=0.95\textwidth]{Ropchaineffect.png}
@@ -127,11 +127,12 @@ The attack consists of several phases
 \begin{enumerate}
   \item Specify attack, analyze necessary setup to be done.~\cref{par:goal}
   \item Extract gadgets using tools, e.g. ROPgadget~\cref{par:ropgadget}
-  \item Determine how many words are needed to override the base pointer \Verb+ebp+
-  \item Determine position of a writable data segment
-  \item Generate payload with the extracted gadgets based on the specification in step 1.
-  \item Insert payload into target using a vulnerability
+  \item Determine how many words are needed to override the base pointer \Verb+ebp+~\cref{par:padding}
+  \item Determine position of a writable data segment~\cref{par:data}
+  \item Generate payload with the extracted gadgets based on the specification in step 1.~\cref{par:genthepayload}
+  \item Insert payload into target using a vulnerability~\cref{par:injthepayload}
 \end{enumerate}
+\subsection{The attack}
 \paragraph{Specification and abstract payload}
 \label{par:goal}
 After specifying the goal and possibly simplifying it we have to determine the required program state. For the example in this paper we want to open a shell, for that the simplest way is to execute an \bltInlineVerb{execve} system call. The following program state~\cref{fig:stateforint} has to be achieved so the interrupt \bltInlineVerb{int 0x80} causes a shell to be opened.~\cite{pixis}~\cite{proggen-rop}
@@ -142,23 +143,33 @@ After specifying the goal and possibly simplifying it we have to determine the r
   \label{fig:stateforint}
 \end{figure}
 \paragraph{Extract gadgets}
-The gadgets can be extracted and like described in~\cref{sec:gadgets}
+The gadgets can be extracted like described in~\cref{sec:gadgets}
 \paragraph{Determine the padding}
+\label{par:padding}
 Compilers optimize stack alignment and without providing options to change that the simplest way to determine the padding required is to test the program until it crashes with a payload increasing by 1 word in each iteration. This can be automated in a Python script~\cref{code:determinewordcount}. This script applies the method mentioned above with the \bltInlineVerb{os.system} function. The return value of that function is the exit code of the program that has been executed and is either \Verb+0+ when the execution ended without any errors and non \Verb+0+ when an error or exception occured during startup or runtime. This means we can increase the input by \bltInlineVerb{"AAAA"} in each iteration until the return value is non zero. At this point the base pointer \bltInlineVerb{ebp} has been overridden causing the program to crash. Now reducing the padding by 1 word results in the correct amount.
 \bltCode{determinewordcount.py}{python}{A Python Script to Determine the Required Words}{code:determinewordcount}
 \paragraph{Determine the address of a writable segment}
+\label{par:data}
 The segments in a binary can be read only or writable. It is possible to determine wether a segment is read only with \bltInlineVerb{objdump -h}. However, the following~\cref{command:finddatasegment} bash command can be used to find the address of the data segment. The data segment contains static and global variables. Since the target program does not have any global or static variables we can override this segment with arbitrary character sequences. In 
 \bltCommand{objdump.sh}{Determine the Address of .data}{command:finddatasegment}
 \paragraph{Generating the payload}
-With this information we can start to construct the ideal payload, based on the description above and some knowledge about assembly the payload could take the following form. \\
-\bltInlineVerb{pop edx | 0x080e5020 | pop eax | "/bin" | pop edx | 0x080e5024 | "//sh" | xor eax, eax | pop edx | 0x080e5028 | mov dword ptr [edx], eax | pop ebx | 0x080e5020 | xor ecx, ecx | xor edx, edx | xor eax, eax | (inc eax) * 11 | int 0x80} \\
-When constructing this ideal payload it is important to know that some \bltInlineVerb{string.h} functions use the \bltInlineVerb{0x00} Byte to identify the end of a string. This means that depending on the implementation of the target it is important to not insert any \bltInlineVerb{0x00} Bytes into the payload otherwise the buffer does overflow fully. In most cases we can still write \bltInlineVerb{0x00} Bytes into registers or into memory. This can be accomplished by \bltInlineVerb{xor}'ing a register with itself and then copying that value into a register or into memory.
-\paragraph{struct.pack}
-\Verb+struct.pack+ is a Python function that allows to easily generate our desired payload from the raw bytes. Bash then allows to directly pipe the generated payload into our target. In order to generate the payload we first have to fill the buffer and override the EBP with arbitary values as seen in line 2~\cref{howtopack}. This is usually done using easily recognizable characters, using the letter \Verb+A+ for this is common. It has the hex value \Verb+0x41+, doing this allows then to spot the buffer in a debugger like \Verb+gdb+. So in this example we fill the buffer with 8 \Verb+A+'s and 4 \Verb+B+'s. After that it is time to insert the addresses of the gadgets and the arguments. This is done by calling pack with the double word (64 Bit) while specifying the endianness, converting that to a string and adding it to the string as seen in line 3~\cref{howtopack}. After the whole payload has been generated we can print it and use the output directly for running the buffer overflow attack as mentioned above.
-\bltCode{pack.py}{python}{How to use struct.pack}{howtopack}
-\subsection{Payload}
-From all the previous steps the payload got constructed using python~\cref{code:payloadbinsh}.
+\label{par:genthepayload}
+There are many ways to generate the payload, the most common and simple method is with pythons \bltInlineVerb{struct.pack} function.~\cite{proggen-rop} The following example~\cref{code:howtopack} illustrates how to generate a payload with \bltInlineVerb{pack}.
+\bltCode{pack.py}{python}{How to use struct.pack}{code:howtopack}
+Now that all requirements are met the payload can be constructed.
+\subparagraph{/bin//sh}
+The first step is to write \bltInlineVerb{/bin//sh} into the \bltInlineVerb{.data} segment. This implies the use of the \bltInlineVerb{mov} function. Ideally the registers used should either be \bltInlineVerb{eax}, \bltInlineVerb{ebx}, \bltInlineVerb{ecx} or \bltInlineVerb{edx} since these registers provide the easiest access, usually with multiple \bltInlineVerb{pop} gadgets in an executable. After checking the gadgets the following seemed like the best gadget: \bltInlineVerb{0x08080742 : mov dword ptr [edx], eax ; ret}. Locating the \bltInlineVerb{pop} instructions for these 4 registers was simple and yielded: \bltInlineVerb{0x080ac76a # pop eax ; ret}, \bltInlineVerb{0x08049022 # pop ebx ; ret}, \bltInlineVerb{0x08054f5b # pop ecx ; add al, 0xf6 ; ret} and \bltInlineVerb{0x0808b285 # pop edx ; xor eax, eax ; pop edi ; ret}. The 3rd gadget adds a number to the \bltInlineVerb{eax} register and the 4th gadget \bltInlineVerb{xor}'s it. For the sake of this attack this is not a problem since we can simply modify \bltInlineVerb{eax} last. The 4th gadget also \bltInlineVerb{pop}'s a value into \bltInlineVerb{edi} which does not interfere with this attack, it just means that we have to provide an arbitary word after the parameter for \bltInlineVerb{pop edx}. With these instructions it is possible to write \bltInlineVerb{"/bin//sh"} into the \bltInlineVerb{.data} segment. Once a string is written into memory it still needs to have a \bltInlineVerb{0x00} Byte added after it, that is because some \bltInlineVerb{string.h} functions use the \bltInlineVerb{0x00} Byte to identify the end of a string. This means that depending on the implementation of the target it is important to not insert any \bltInlineVerb{0x00} Bytes into the payload otherwise the buffer does overflow fully. In most cases we can still write \bltInlineVerb{0x00} Bytes into registers or into memory. This can be accomplished by \bltInlineVerb{xor}'ing a register with itself and then copying that value into a register or into memory. In order to write a \bltInlineVerb{0x00} Byte after the string we can \bltInlineVerb{xor} the \bltInlineVerb{eax} register with \bltInlineVerb{0x08050a08 # xor eax, eax ; ret}. After that we simply have to copy it again.
+\subparagraph{Initializing the registers}
+As seen in~\cref{fig:stateforint} we first need to write the address of \bltInlineVerb{/bin//sh} into \bltInlineVerb{ebx}, this can simply be done with the \bltInlineVerb{pop ebx ; ret} gadget. Then we need to clear \bltInlineVerb{ecx} and \bltInlineVerb{edx}. For clearing \bltInlineVerb{edx} the gadget \bltInlineVerb{0x0807b179 # xor edx, edx ; mov eax, edx ; ret} is a good candidate, since it only modifies \bltInlineVerb{eax} apart from the desired effect. There were no \bltInlineVerb{xor ecx, ecx} or \bltInlineVerb{mov ecx, <reg>} gadgets that ended on a return so \bltInlineVerb{ecx} was just set to point at the null pointer after the \bltInlineVerb{/bin//sh} string, making the provided argument list empty. The last step to set up the \bltInlineVerb{execve} system call is to set \bltInlineVerb{eax} to \bltInlineVerb{11}/\bltInlineVerb{0x0B}. For that we can use the \bltInlineVerb{0x08050a08 # xor eax, eax ; ret} gadget from before to set \bltInlineVerb{eax} to \bltInlineVerb{0x00} and then increment it 11 times with \bltInlineVerb{0x0809d0ae # inc eax ; ret}.
+\subparagraph{Interrupt}
+In the end the \bltInlineVerb{0x080499b2 # int 0x80} interrupt gets called. If the state got initialized correctly \bltInlineVerb{/bin//sh} gets executed.
+\subparagraph{Constructing the payload}
+From all the previous steps the payload got constructed with python~\cref{code:payloadbinsh}. As seen in the example we can define all the addresses, gadgets and other parameters as variables and reuse them in the \bltInlineVerb{pack} calls, this way changing a gadget only requires one value to be changed. The different
 \bltCode{payload.py}{python}{Payload to open /bin/sh}{code:payloadbinsh}
+\paragraph{Injecting the payload}
+\label{par:injthepayload}
+How the payload gets injected depends on the target. For the example in this paper the payload can be injected using the following commands~\cref{command:injthepayload}.
+\bltCommand{inject.sh}{Injecting the payload}{command:injthepayload}
 \section{Results}
 \paragraph{Attack}
 After injecting the generated payload from \cref{sec:attack} as a command line argument the program opened a shell from which we can use privilege escalation techniques in order to completely compromise the system.
@@ -168,24 +179,17 @@ After injecting the generated payload from \cref{sec:attack} as a command line a
   \caption{Shell Opened iwith ROP}
   \label{fig:success}
 \end{figure}
-The only compiler features that had to be disabled were PIE and stack canaries. It is likely that there are systems still in use today which are vulnerable to this kind of attack. Since it allows almost arbitrary code execution it is very important to identify these devices and patch or replace them.
+The only protections that had to be disabled were stack canaries and ASLR. It is likely that there are systems still in use today which are vulnerable to this kind of attack due to not having these protections or the protections themselves being attackable. Since it allows almost arbitrary code execution it is very important to identify these devices and patch or replace them.
 \paragraph{ASLR}
-The information wether ROP works with ASLR enabled is inconsistent. While trying this attack with \bltInlineVerb{/proc/sys/kernel/randomize_va_space} set to \bltInlineVerb{2} meaning full randomization the attack still seemed to work. The inconsistent information probably arises due to different approaches being used. With executables that have PIE enabled ROP is still possible but only with ASLR disabled. With the compiler options used for this example PIE is disabled and ASLR seems to have no effect on the exploit. This is because the ASLR settings \Verb+1+ and \Verb+2+ only randomize shared libraries and PIE binaries~\cite{rny}, since the program has been compiled with the \bltInlineVerb{-static} option, which implicitly compiles the program to not be position independent.
+The information wether ROP works with ASLR enabled is inconsistent. While trying this attack with \bltInlineVerb{/proc/sys/kernel/randomize_va_space} set to \bltInlineVerb{2} meaning full randomization the attack still seemed to work. The inconsistent information probably arises due to different approaches being used. With executables that have PIE enabled ROP is still possible but only with ASLR disabled~\cite{el-sherei}. With the compiler options used for this example PIE is disabled and ASLR seems to have no effect on the exploit. This is because the ASLR settings \Verb+1+ and \Verb+2+ only randomize shared libraries and PIE binaries~\cite{rny}, since the program has been compiled with the \bltInlineVerb{-static} option, which implicitly compiles the program to not be position independent, ASLR is not being used, even when activated.
 
 \section{Protection}
 \paragraph{Stack canaries}
 Stack canaries are one of the most effective approaches against ROP, they are enabled by default and prevent most forms of buffer overflows, however, stack canaries can be based on a small entropy pool and can therfore be bruteforced with an effort significantly smaller than regular bruteforcing. Depending on the target it can still be profitable and possible to bruteforce it even with a big entropy pool and high randomness.
 \paragraph{NX}
-The activation of the NX bit has no effect on ROP since the program never executes code outside the segments marked with the \bltInlineVerb{CODE} flag like in a classical stack overflow attack.
+The activation of the NX bit has no effect on ROP since the program never executes code outside the segments marked with the \bltInlineVerb{CODE} flag like in a classical stack overflow attack.~\cite{ropsla}
 \paragraph{ASLR}
-ASLR is a good protection against ROP since libraries and code locations get randomized each time the program is run. 32 Bit binaries only use 16 Bit for ASLR
-\paragraph{PIE}
-
-\section{Discussion}
-Sources:
-
-\bltInlineVerb{https://www.exploit-db.com/docs/english/28479-return-oriented-programming-(rop-ftw).pdf}
-\bltInlineVerb{https://guyinatuxedo.github.io/5.1-mitigation_aslr_pie/index.html}
+According to a paper by Hovav Shacham et al. ASLR is a good protection against ROP in 64 bit binaries assuming no side channel leakage since 40 bit are available for randomizations of the libraries and code locations, however, 32 Bit binaries only use 16 Bit for randomization. Because of that they were able to perform a buffer overflow attack like ret2libc on an Apache server with an average of 216 seconds.~\cite{aslr}
 %%%% 8. BILBIOGRAPHY %%%%
 \bibliographystyle{alpha}
 \bibliography{refs}
