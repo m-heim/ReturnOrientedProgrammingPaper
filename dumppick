@@ -1,10 +1,7 @@
 0x08059ee3 : mov word ptr [edx], ax ; mov eax, edx ; ret
-0x08071e4e : mov esp, 0xc70cec83 ; ret 0xffe0
 0x0807faa3 : sti ; xor eax, eax ; ret
 0x0808b285 : pop edx ; xor eax, eax ; pop edi ; ret
 0x080539e7 : mov esp, 0x39fffffd ; ret
-0x0804b8d4 : xchg eax, esp ; ret
 0x08095aef : mov esi, eax ; pop ebx ; mov eax, esi ; pop esi ; pop edi ; pop ebp ; ret
 0x0806ceec : pop es ; add byte ptr [ebx - 0x39], dl ; ret 0xffd4
-0x0804a444 : or eax, 0xffffffff ; ret
 0x08051bce : dec eax ; ret
