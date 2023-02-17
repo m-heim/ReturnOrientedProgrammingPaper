@@ -54,8 +54,6 @@
 ROP is a buffer overflow exploitation technique developed in 2007. Under certain circumstances it can provide arbitrary code execution on assembly level, because of that it is a devastating technique for black-hats. Modern 64 Bit binaries are generally decently secure against ROP with ASLR and stack protections enabled. 32 Bit binaries or binaries compiled for non PC systems may not provide the same protection though and may be vulnerable to ROP. 
 \end{abstract}
 
-\section{Introduction}
-
 %%%% 7. PAPER CONTENT %%%%
 \section{Introduction}
 Return Oriented Programming, abbreviated ROP is a type of buffer overflow attack that has been published in 2007 by Hovav Shacham.~\cite{ropfirstpaper} and has become a widely known buffer overflow technique since. It has been developed to circumvent the NX-BIT protection that protects the stack from being executed. The general consensus is that modern binaries are practically not vulnerable to buffer overflow attacks, but there is a lot of research surrounding breaking of these security measures that shows practical strength of these security measures does not equal the theoretical strength due to side channels, bugs or other exploits.~\cite{aslr} With high enough reward ROP may be a devastating technique for black-hats, because of that it is important to raise awareness about binary exploitation generally and ROP. Because of that this paper will demonstrate the underlying theory and demonstrate it with an attack on a vulnerable binary.
@@ -98,13 +96,13 @@ for all of these regular expressions there were gadgets for the given program in
 \section{Theory}
 \subsection{Stack}
 The following graphic~\cref{fig:stack} is an illustration of how the stack changes when injecting the payload. The buffer first has to be filled. In binary exploitation the letter \Verb+A+ is used for that most of the time, it has an easy to identify hexadecimal value of \bltInlineVerb{0x41}. It is important to note that without any special compiler options the stack will be aligned in \bltInlineVerb{dword}'s/16 Byte blocks. because of that the buffer has to be filled with more bytes than the buffer holds if $s \mod 16 \neq 0$ holds true, s being the buffer size in Bytes.
+\newpage
 \begin{figure}[h!]
   \centering
   \includegraphics[width=0.79\textwidth]{stackropoffsec.png}
   \caption{The stack when injecting the payload}
   \label{fig:stack}
 \end{figure}
-\\
 \subsection{ROP Runtime Behaviour}
 The following graphic~\cref{fig:executionatruntime} illustrates how the gadgets get executed once the instruction pointer \bltInlineVerb{eip} points to the \bltInlineVerb{ret} in \bltInlineVerb{main}. Once this happens the execution gets redirected to the first gadget and executes the instructions in it. As soon as \bltInlineVerb{eip} points to the \bltInlineVerb{ret} in the 1st gadget the address of the 2nd gadget is \bltInlineVerb{pop}'d into \bltInlineVerb{eip} and execution continues there, from there the same thing happens again until execution reaches the end of the last gadget.
 \begin{figure}[h!]
