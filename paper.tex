@@ -116,10 +116,10 @@ The following graphic~\cref{fig:executionatruntime} illustrates how the gadgets 
 \label{sec:attack}
 \subsection{Target Program}
 \paragraph{Target Program}
-The following program is the target of our attack, it uses a command line argument to provide the payload and \Verb+strcpy+ for the buffer overflow, overwriting the return address after the 8 Byte buffer. Using vulnerable input functions also works though.
+The following program is the target of our attack, it uses a command line argument to provide the payload and \Verb+strcpy+ for the buffer overflow, overwriting the return address after the 8 Byte buffer. It is also possible to perform vulnerable input functions like \bltInlineVerb{scanf}.
 \bltCode{vuln.c}{c}{The Target Program}{thetargetprogram}
 \paragraph{Compilation}
-We compile the target program with the following command. There are several important options given in this command. Most importantly the \bltInlineVerb{-fno-stack-protector} option disables stack canaries which would otherwise directly terminate the program when the canary is overwritten. The \Verb+-m32+ option compiles the binary as a 32 Bit executable, this makes the attack easier. The \Verb+-static+ option makes the binary statically linked. Without this option there are only 50 gadgets available, considering most of them are not useful for our attack it is practically impossible to perform the attack with just these gadgets. The \Verb+-static+ option includes the \Verb+libc+ library in the executable, increasing the gadget count to over 8000. However, it is possible to determine the address of the dynamically linked library at runtime and adding an offset for each gadget to this address. This has been described by Saif El-Sherei~\cite{el-sherei} but will not be further discussed in this paper
+We compile the target program with the following command. There are several important options given in this command. Most importantly the \bltInlineVerb{-fno-stack-protector} option disables stack canaries which would otherwise directly terminate the program when the canary is overwritten. The \Verb+-m32+ option compiles the binary as a 32 Bit executable, this makes the attack easier. The \Verb+-static+ option makes the binary statically linked. Without this option there are only 50 gadgets available, considering most of them are not useful for our attack it is practically impossible to perform the attack with just these gadgets. The \Verb+-static+ option includes the \Verb+libc+ library in the executable, increasing the gadget count to over 8000. However, it is possible to determine the address of the dynamically linked library at runtime and adding an offset for each gadget to this address. This has been described by Saif El-Sherei~\cite{el-sherei} but will not be further discussed in this paper.
 \bltCommand{compilation.sh}{The compliation command}{thecompilationcommand}
 \subsection{Phases of developing the attack}
 \paragraph{Phases}
@@ -135,7 +135,7 @@ The attack consists of several phases
   \item Insert payload into target using a vulnerability
 \end{enumerate}
 \paragraph{Goal and abstract payload}
-After specifying the goal and possibly simplifying it we have to write a list of instructions and arguments that achieve the goal, for this its favorable to directly use the format of the final payload except for using instructions instead of addresses as this will then allow to simply insert the found gadgets into this abstract payload. For the example in this paper we want to open a shell, for that the simplest way is to execute an execve system call. The following program state~\cref{fig:stateforint} has to be achieved so the interrupt \bltInlineVerb{int 0x80} causes a shell to be opened.~\cite{pixis}~\cite{proggen-rop}
+After specifying the goal and possibly simplifying it we have to write a list of instructions and arguments that achieve the goal, for this it is favorable to directly use the format of the final payload except for using instructions instead of addresses as this will then allow to simply insert the found gadgets into this abstract payload. For the example in this paper we want to open a shell, for that the simplest way is to execute an execve system call. The following program state~\cref{fig:stateforint} has to be achieved so the interrupt \bltInlineVerb{int 0x80} causes a shell to be opened.~\cite{pixis}~\cite{proggen-rop}
 \begin{figure}[h]
   \centering
   \includegraphics[width=0.95\textwidth]{requirementstackmemory.png}
@@ -157,9 +157,16 @@ From all the previous steps the payload got constructed using python~\cref{code:
 \bltCode{payload.py}{python}{Payload to open /bin/sh}{code:payloadbinsh}
 \section{Results}
 \paragraph{Attack}
-After injecting the generated payload from \cref{sec:attack} as a command line argument the program opened a shell from which we can use privilege escalation techniques in order to completely compromise the system. The only compiler options that had to be activated were PIE and stack canaries. It is likely that there are systems still in use today which are vulnerable to this kind of attack. Since it allows almost arbitrary code execution it is very important to identify these devices and patch or replace them.
+After injecting the generated payload from \cref{sec:attack} as a command line argument the program opened a shell from which we can use privilege escalation techniques in order to completely compromise the system.
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.95\textwidth]{ROPdone.png}
+  \caption{Shell Opened iwith ROP}
+  \label{fig:success}
+\end{figure}
+The only compiler features that had to be disabled were PIE and stack canaries. It is likely that there are systems still in use today which are vulnerable to this kind of attack. Since it allows almost arbitrary code execution it is very important to identify these devices and patch or replace them.
 \paragraph{ASLR}
-The information about wether or not ROP can be applied to systems with ASLR enabled is inconsistent. In the run with PIE and stack canaries disabled the attack still worked even with \Verb+/proc/sys/kernel/randomize_va_space+ set to \Verb+2+, meaning full randomization of the different segments like header, libraries and stack. This is probably due to PIE
+The information wether ROP works with ASLR enabled is inconsistent. While trying this attack with \bltInlineVerb{/proc/sys/kernel/randomize_va_space} set to \bltInlineVerb{2} meaning full randomization the attack still seemed to work. The inconsistent information probably arises due to different approaches being used. With executables that have PIE enabled ROP is still possible but only with ASLR disabled. With the compiler options used for this example PIE is disabled and ASLR seems to have no effect on the exploit. This is because
 
 \section{Protection}
 \paragraph{Stack canaries}
