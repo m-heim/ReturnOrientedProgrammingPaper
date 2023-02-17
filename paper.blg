@@ -3,46 +3,47 @@ Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
 The top-level auxiliary file: paper.aux
 The style file: alpha.bst
 Database file #1: refs.bib
+Warning--to sort, need author or key in retx86
 Warning--to sort, need author or key in proggen-rop
-You've used 5 entries,
+You've used 6 entries,
             2543 wiz_defined-function locations,
-            586 strings with 5305 characters,
-and the built_in function-call counts, 1430 in all, are:
-= -- 134
-> -- 56
+            590 strings with 5465 characters,
+and the built_in function-call counts, 1641 in all, are:
+= -- 155
+> -- 57
 < -- 3
 + -- 18
 - -- 18
-* -- 81
-:= -- 231
-add.period$ -- 13
-call.type$ -- 5
-change.case$ -- 26
-chr.to.int$ -- 5
-cite$ -- 7
-duplicate$ -- 56
-empty$ -- 124
+* -- 91
+:= -- 255
+add.period$ -- 15
+call.type$ -- 6
+change.case$ -- 30
+chr.to.int$ -- 6
+cite$ -- 10
+duplicate$ -- 66
+empty$ -- 151
 format.name$ -- 24
-if$ -- 296
+if$ -- 346
 int.to.chr$ -- 1
 int.to.str$ -- 0
 missing$ -- 1
-newline$ -- 26
+newline$ -- 30
 num.names$ -- 12
-pop$ -- 46
+pop$ -- 56
 preamble$ -- 1
-purify$ -- 32
+purify$ -- 37
 quote$ -- 0
-skip$ -- 56
+skip$ -- 65
 stack$ -- 0
-substring$ -- 36
-swap$ -- 5
+substring$ -- 44
+swap$ -- 6
 text.length$ -- 3
 text.prefix$ -- 2
 top$ -- 0
-type$ -- 40
-warning$ -- 1
+type$ -- 48
+warning$ -- 2
 while$ -- 9
-width$ -- 6
-write$ -- 56
-(There was 1 warning)
+width$ -- 8
+write$ -- 65
+(There were 2 warnings)

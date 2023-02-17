@@ -26,4 +26,8 @@ Ryan Roemer, Erik Buchanan, Hovav Shacham, and Stefan Savage.
 \newblock Return-oriented programming: Systems, languages, and applications.
 \newblock {\em ACM Trans. Inf. Syst. Secur.}, 15(1), mar 2012.
 
+\bibitem[ret]{retx86}
+X86 instruction set reference - return from procedure.
+\newblock \url{https://c9x.me/x86/html/file_module_x86_id_280.html}.
+
 \end{thebibliography}

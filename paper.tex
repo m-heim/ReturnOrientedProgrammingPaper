@@ -58,22 +58,21 @@
 %%%% 7. PAPER CONTENT %%%%
 \section{Introduction}
 BIBLIOGRAFIE NICHT VERGESSEN
-Return Oriented Programming is a type of buffer overflow attack that has been published in 2007 and ever since has become a widely known buffer overflow technique. It has been developed to circumvent the NX-BIT protection that protects the stack from being executed. At the time of writing this paper modern techniques like Stack Carnaries and ASLR prevent these attacks from being practical but there are millions of running systems using old hard-, firm- and software that is possibly vulnerable to these kinds of buffer overflow attacks. Return Oriented Programming is based on chaining return addresses to code just before a return and therefor allowing almost arbitrary code segments to be chained.
+Return Oriented Programming, abbreviated ROP is a type of buffer overflow attack that has been published in 2007 by Hovav Shacham~\cref{hshacham} and has become a widely known buffer overflow technique since. It has been developed to circumvent the NX-BIT protection that protects the stack from being executed. At the time of writing this paper modern techniques like stack carnaries and ASLR make these attacks hard and very time consuming on modern systems. That is not to say ASLR and stack canaries can not be broken by bruteforcing or side channels. Since there are millions of running systems with old hard-, firm- and software that is possibly vulnerable to these kinds of attacks it is still relevant to this day. The main idea in ROP is based on chaining return addresses to code just before a return and therefore allowing almost arbitrary cpu instructions to be chained.
 
 
 \section{Gadgets}
-\label{sec:main}
+\label{sec:gadgets}
 \paragraph{Introduction}
-On the x86 architecture the \Verb+ret+ instruction is defined to pop the return instruction pointer from the stack into the \Verb+eip+ register and redirect code execution to that memory address. By chaining addresses of instructions that end on a return and injecting them 
-Gadgets are code segments that sit before a \Verb+ret+ instruction, these assembly instructions can be chained arbitrarily
+On the x86 architecture the \Verb+ret+ instruction is defined to pop the return instruction pointer from the stack into the \Verb+eip+ register and redirect code execution to that memory address.~\cite{retx86} A ROP gadget consists of a few instructions (usually 1-3) that end on a \bltInlineVerb{ret}.
 
 \paragraph{How to find Gadgets}
 \label{par:ropgadget}
-A gadget can be found by searching for \Verb+0xC3+ Bytes in the program. The instructions before then represent the code we can use, for that we need the address of the gadget. It is possible this manually using tools like \Verb+objdump+, \Verb+hexdump+ or use one of the many tools available, to name a few there is \Verb+ropper+, \Verb+ROPgadget+ and \Verb+pwntools+. For this paper i will be using \Verb+ROPgadget+ since i found it easy to use and fast. \Verb+ROPgadget+ can be found in most package managers or can be downloaded directly from \url{https://github.com/JonathanSalwan/ROPgadget}. The gadgets can be extracted from the file using the following command~\cref{dumpallgadgets}. We can then use regular expressions to search for the gadgets that we need.
+A gadget can be found by searching for \Verb+0xC3+ Bytes in the program. The instructions before then represent the code code that can be executed by injecting the addresses of these instructions. It is possible to search for gadgets with \Verb+objdump+ or \Verb+hexdump+, however, the tools specifically made for finding ROP gadgets are really easy to use and provide lots of customizability and features for finding the required gadgets. To name a few ROP gadget tools there is \Verb+ropper+, \Verb+ROPgadget+ and \Verb+pwntools+. For this paper the software \Verb+ROPgadget+ has been employed since i found it easy to use. \bltInlineVerb{ROPgadget} can be found in most package managers or can be downloaded directly from \url{https://github.com/JonathanSalwan/ROPgadget}. The gadgets can be extracted from the file with the following command~\cref{dumpallgadgets}. We can then use regular expressions or ROPgadget directly to search for the required gadgets.
 \bltCommand{ropcommand.sh}{Exporting gadgets with ROPgadget}{dumpallgadgets}
 This command produces an output with results similar to this.
 \bltResult{dumppick}{Output of ROPgadget}{outputropgadget}
-These are only 10 Lines out of the 8244 lines found by the tool though and i purposefully filtered out some good and bad ones for demonstration. It is clearly visible that many candidates for ROP can be found, even in a file with a relatively small size of 72 kB. Though most of these gadgets are not all that useful because they often modify a lot of registers, possibly messing up the desired state or they use a fixed return address. In most cases we can find suitable candidates using regular expressions though, this will be demonstrated later in this section.
+These are only 10 Lines out of the 8244 lines found by the tool though and i purposefully filtered out some good and bad ones for demonstration. It is clearly visible that many candidates for ROP can be found, even in a file with a relatively small size of 72 kB. Though most of these gadgets are not all that useful because they often modify a lot of registers, possibly messing up the desired state. In most cases we can find suitable candidates using regular expressions, this will be demonstrated later in this section~\cref{subsec:filtering}.
 \paragraph{Overview of powerful gadgets}
 \paragraph{pop}
 \Verb+pop+ allows us to write arbitrary values into registers. For that we search for a \Verb+pop <reg>+ instruction inside our gadgets, in the payload we can then place the value that we want to insert after the address of the \Verb+pop+ instruction.~\cite{ropsla} If we can not find a suitable gadget we can try to get creative and achieve the desired state another way. For example if we want to modify \Verb+ecx+ but do not have a \Verb+pop ecx+ instruction available we could achieve it with something like this: \bltInlineVerb{xor ecx, ecx ; pop eax ; xor ecx, eax}. Provided that we have these gadgets available.
@@ -84,10 +83,11 @@ Arithmetic operations like \Verb+add+, \Verb+sub+, \Verb+inc+, \Verb+xor+, \Verb
 \paragraph{int 0x80}
 \Verb+int+ stands for interrupt, the interrupt \bltInlineVerb{int 0x80} causes a system call to be executed. System calls are kernelspace programs/operations that require higher privileges than what is available in a userspace program. Examples for system calls include io and \Verb+execve+ which allows to execute arbitary programs. In combination with \Verb+pop+, \Verb+mov+ and other instructions we can specify the concrete system call.~\cite{ropsla} One of the most powerful system calls for blackhats is bash since it allows permanently implementing malware or gain insight into files, it can be called with the argument \Verb+/bin/sh+. This will be demonstrated in~\cref{sec:attack}
 \subsection{Filtering the gadgets}
+\label{subsec:filtering}
 \paragraph{Introduction}
-In order to find the gadgets we want we can use the tools directly or we can use regular expressions. In order to make this paper more general and easy to replicate i will be using regular expressions to find the desired gadgets.
+In order to find the required gadgets we can use the tools directly or we can use regular expressions. In order to make this paper more general and easy to replicate i will be using regular expressions to find the desired gadgets.
 \paragraph{Gadgets and their corresponding Regular Expression}
-The following table describes what regex we can use to find the gadgets needed for the attack.
+The following table describes what regex we can use to find the gadgets required for the attack.
 \begin{itemize}
 \item pop edx  $\rightarrow$ \bltRegex{\^{}.\{0,20\}pop edx.\{0,20\}ret\textbackslash{}n}
 \item int 0x80  $\rightarrow$ \bltRegex{\^{}.\{0,20\}int 0x80\textbackslash{}n} 
@@ -97,7 +97,7 @@ for all of these regular expressions there were gadgets for the given program in
 
 \section{Theory}
 \subsection{Stack}
-The following graphic~\cref{fig:stack} is an illustration of how the stack changes when injecting the payload. The buffer first has to be filled. In binary exploitation the letter \Verb+A+ is used for that most of the time, it has an easy to identify hexadecimal value of \bltInlineVerb{0x41}. It is important to note that without any special compiler options the stack will be aligned in \bltInlineVerb{dword}'s, because of that the buffer has to be filled with 16 Bytes instead of 8 Bytes, this can be turned off with the option \bltInlineVerb{-mpreferred-stack-boundary=2}. Though, then the payload only worked when filling the buffer with 24 Bytes.
+The following graphic~\cref{fig:stack} is an illustration of how the stack changes when injecting the payload. The buffer first has to be filled. In binary exploitation the letter \Verb+A+ is used for that most of the time, it has an easy to identify hexadecimal value of \bltInlineVerb{0x41}. It is important to note that without any special compiler options the stack will be aligned in \bltInlineVerb{dword}'s, because of that the buffer has to be filled with 16 Bytes instead of 8 Bytes, this can be turned off with the option \bltInlineVerb{-mpreferred-stack-boundary=2}. Surprisingly the payload then only worked when filling the buffer with 24 Bytes.
 \begin{figure}[h!]
   \centering
   \includegraphics[width=0.79\textwidth]{stackropoffsec.png}
@@ -105,7 +105,7 @@ The following graphic~\cref{fig:stack} is an illustration of how the stack chang
   \label{fig:stack}
 \end{figure}
 \subsection{ROP Runtime Behaviour}
-The following graphic~\cref{fig:executionatruntime} illustrates how the gadgets get executed once the instruction pointer \bltInlineVerb{eip} points to the ret in main.
+The following graphic~\cref{fig:executionatruntime} illustrates how the gadgets get executed once the instruction pointer \bltInlineVerb{eip} points to the \bltInlineVerb{ret} in \bltInlineVerb{main}.
 \begin{figure}[h!]
   \centering
   \includegraphics[width=0.95\textwidth]{Ropchaineffect.png}
@@ -116,7 +116,7 @@ The following graphic~\cref{fig:executionatruntime} illustrates how the gadgets 
 \label{sec:attack}
 \subsection{Target Program}
 \paragraph{Target Program}
-The following program is the target of our attack, it uses a command line argument to provide the payload and \Verb+strcpy+ for the buffer overflow, overwriting the return address after the 8 Byte buffer. It is also possible to perform vulnerable input functions like \bltInlineVerb{scanf}.
+The following program is the target of our attack, it uses a command line argument to provide the payload and \Verb+strcpy+ for the buffer overflow, overwriting the return address after the 8 Byte buffer.
 \bltCode{vuln.c}{c}{The Target Program}{thetargetprogram}
 \paragraph{Compilation}
 We compile the target program with the following command. There are several important options given in this command. Most importantly the \bltInlineVerb{-fno-stack-protector} option disables stack canaries which would otherwise directly terminate the program when the canary is overwritten. The \Verb+-m32+ option compiles the binary as a 32 Bit executable, this makes the attack easier. The \Verb+-static+ option makes the binary statically linked. Without this option there are only 50 gadgets available, considering most of them are not useful for our attack it is practically impossible to perform the attack with just these gadgets. The \Verb+-static+ option includes the \Verb+libc+ library in the executable, increasing the gadget count to over 8000. However, it is possible to determine the address of the dynamically linked library at runtime and adding an offset for each gadget to this address. This has been described by Saif El-Sherei~\cite{el-sherei} but will not be further discussed in this paper.
@@ -125,30 +125,34 @@ We compile the target program with the following command. There are several impo
 \paragraph{Phases}
 The attack consists of several phases
 \begin{enumerate}
-  \item Specify goal with required program state and instructions
-  \item Generate desired list of instructions and arguments (abstract payload/rop chain)
+  \item Specify attack, analyze necessary setup to be done.~\cref{par:goal}
   \item Extract gadgets using tools, e.g. ROPgadget~\cref{par:ropgadget}
-  \item Search gadgets for instructions
   \item Determine how many words are needed to override the base pointer \Verb+ebp+
   \item Determine position of a writable data segment
-  \item Generate payload using the gadgets according to the the abstract payload while making sure gadgets dont interfere with our desired program state. This step can be done using Python which we will show in a later section~\cref{howtopack}
+  \item Generate payload with the extracted gadgets based on the specification in step 1.
   \item Insert payload into target using a vulnerability
 \end{enumerate}
-\paragraph{Goal and abstract payload}
-After specifying the goal and possibly simplifying it we have to write a list of instructions and arguments that achieve the goal, for this it is favorable to directly use the format of the final payload except for using instructions instead of addresses as this will then allow to simply insert the found gadgets into this abstract payload. For the example in this paper we want to open a shell, for that the simplest way is to execute an execve system call. The following program state~\cref{fig:stateforint} has to be achieved so the interrupt \bltInlineVerb{int 0x80} causes a shell to be opened.~\cite{pixis}~\cite{proggen-rop}
+\paragraph{Specification and abstract payload}
+\label{par:goal}
+After specifying the goal and possibly simplifying it we have to determine the required program state. For the example in this paper we want to open a shell, for that the simplest way is to execute an \bltInlineVerb{execve} system call. The following program state~\cref{fig:stateforint} has to be achieved so the interrupt \bltInlineVerb{int 0x80} causes a shell to be opened.~\cite{pixis}~\cite{proggen-rop}
 \begin{figure}[h]
   \centering
   \includegraphics[width=0.95\textwidth]{requirementstackmemory.png}
   \caption{Required Program State for the execve Syscall}
   \label{fig:stateforint}
 \end{figure}
-\paragraph{Extract and search gadgets}
+\paragraph{Extract gadgets}
+The gadgets can be extracted and like described in~\cref{sec:gadgets}
 \paragraph{Determine the padding}
 Compilers optimize stack alignment and without providing options to change that the simplest way to determine the padding required is to test the program until it crashes with a payload increasing by 1 word in each iteration. This can be automated in a Python script~\cref{code:determinewordcount}. This script applies the method mentioned above with the \bltInlineVerb{os.system} function. The return value of that function is the exit code of the program that has been executed and is either \Verb+0+ when the execution ended without any errors and non \Verb+0+ when an error or exception occured during startup or runtime. This means we can increase the input by \bltInlineVerb{"AAAA"} in each iteration until the return value is non zero. At this point the base pointer \bltInlineVerb{ebp} has been overridden causing the program to crash. Now reducing the padding by 1 word results in the correct amount.
 \bltCode{determinewordcount.py}{python}{A Python Script to Determine the Required Words}{code:determinewordcount}
 \paragraph{Determine the address of a writable segment}
-There segments in a binary can be read only or writable. It is possible to determine wether a segment is read only with \bltInlineVerb{objdump -h}. However, the following~\cref{command:finddatasegment} bash command can be used to find the address of the data segment.
+The segments in a binary can be read only or writable. It is possible to determine wether a segment is read only with \bltInlineVerb{objdump -h}. However, the following~\cref{command:finddatasegment} bash command can be used to find the address of the data segment. The data segment contains static and global variables. Since the target program does not have any global or static variables we can override this segment with arbitrary character sequences. In 
 \bltCommand{objdump.sh}{Determine the Address of .data}{command:finddatasegment}
+\paragraph{Generating the payload}
+With this information we can start to construct the ideal payload, based on the description above and some knowledge about assembly the payload could take the following form. \\
+\bltInlineVerb{pop edx | 0x080e5020 | pop eax | "/bin" | pop edx | 0x080e5024 | "//sh" | xor eax, eax | pop edx | 0x080e5028 | mov dword ptr [edx], eax | pop ebx | 0x080e5020 | xor ecx, ecx | xor edx, edx | xor eax, eax | (inc eax) * 11 | int 0x80} \\
+When constructing this ideal payload it is important to know that some \bltInlineVerb{string.h} functions use the \bltInlineVerb{0x00} Byte to identify the end of a string. This means that depending on the implementation of the target it is important to not insert any \bltInlineVerb{0x00} Bytes into the payload otherwise the buffer does overflow fully. In most cases we can still write \bltInlineVerb{0x00} Bytes into registers or into memory. This can be accomplished by \bltInlineVerb{xor}'ing a register with itself and then copying that value into a register or into memory.
 \paragraph{struct.pack}
 \Verb+struct.pack+ is a Python function that allows to easily generate our desired payload from the raw bytes. Bash then allows to directly pipe the generated payload into our target. In order to generate the payload we first have to fill the buffer and override the EBP with arbitary values as seen in line 2~\cref{howtopack}. This is usually done using easily recognizable characters, using the letter \Verb+A+ for this is common. It has the hex value \Verb+0x41+, doing this allows then to spot the buffer in a debugger like \Verb+gdb+. So in this example we fill the buffer with 8 \Verb+A+'s and 4 \Verb+B+'s. After that it is time to insert the addresses of the gadgets and the arguments. This is done by calling pack with the double word (64 Bit) while specifying the endianness, converting that to a string and adding it to the string as seen in line 3~\cref{howtopack}. After the whole payload has been generated we can print it and use the output directly for running the buffer overflow attack as mentioned above.
 \bltCode{pack.py}{python}{How to use struct.pack}{howtopack}
