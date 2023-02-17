@@ -4,45 +4,45 @@ The top-level auxiliary file: paper.aux
 The style file: alpha.bst
 Database file #1: refs.bib
 Warning--to sort, need author or key in proggen-rop
-You've used 4 entries,
+You've used 5 entries,
             2543 wiz_defined-function locations,
-            582 strings with 5167 characters,
-and the built_in function-call counts, 1177 in all, are:
-= -- 111
-> -- 48
-< -- 2
-+ -- 16
-- -- 16
-* -- 71
-:= -- 192
-add.period$ -- 11
-call.type$ -- 4
-change.case$ -- 22
-chr.to.int$ -- 4
-cite$ -- 6
-duplicate$ -- 45
-empty$ -- 99
-format.name$ -- 20
-if$ -- 242
+            586 strings with 5305 characters,
+and the built_in function-call counts, 1430 in all, are:
+= -- 134
+> -- 56
+< -- 3
++ -- 18
+- -- 18
+* -- 81
+:= -- 231
+add.period$ -- 13
+call.type$ -- 5
+change.case$ -- 26
+chr.to.int$ -- 5
+cite$ -- 7
+duplicate$ -- 56
+empty$ -- 124
+format.name$ -- 24
+if$ -- 296
 int.to.chr$ -- 1
 int.to.str$ -- 0
 missing$ -- 1
-newline$ -- 22
-num.names$ -- 9
-pop$ -- 34
+newline$ -- 26
+num.names$ -- 12
+pop$ -- 46
 preamble$ -- 1
-purify$ -- 26
+purify$ -- 32
 quote$ -- 0
-skip$ -- 46
+skip$ -- 56
 stack$ -- 0
-substring$ -- 29
-swap$ -- 4
-text.length$ -- 2
-text.prefix$ -- 1
+substring$ -- 36
+swap$ -- 5
+text.length$ -- 3
+text.prefix$ -- 2
 top$ -- 0
-type$ -- 32
+type$ -- 40
 warning$ -- 1
-while$ -- 7
-width$ -- 5
-write$ -- 47
+while$ -- 9
+width$ -- 6
+write$ -- 56
 (There was 1 warning)

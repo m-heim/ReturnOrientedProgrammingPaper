@@ -166,7 +166,7 @@ After injecting the generated payload from \cref{sec:attack} as a command line a
 \end{figure}
 The only compiler features that had to be disabled were PIE and stack canaries. It is likely that there are systems still in use today which are vulnerable to this kind of attack. Since it allows almost arbitrary code execution it is very important to identify these devices and patch or replace them.
 \paragraph{ASLR}
-The information wether ROP works with ASLR enabled is inconsistent. While trying this attack with \bltInlineVerb{/proc/sys/kernel/randomize_va_space} set to \bltInlineVerb{2} meaning full randomization the attack still seemed to work. The inconsistent information probably arises due to different approaches being used. With executables that have PIE enabled ROP is still possible but only with ASLR disabled. With the compiler options used for this example PIE is disabled and ASLR seems to have no effect on the exploit. This is because
+The information wether ROP works with ASLR enabled is inconsistent. While trying this attack with \bltInlineVerb{/proc/sys/kernel/randomize_va_space} set to \bltInlineVerb{2} meaning full randomization the attack still seemed to work. The inconsistent information probably arises due to different approaches being used. With executables that have PIE enabled ROP is still possible but only with ASLR disabled. With the compiler options used for this example PIE is disabled and ASLR seems to have no effect on the exploit. This is because the ASLR settings \Verb+1+ and \Verb+2+ only randomize shared libraries and PIE binaries~\cite{rny}, since the program has been compiled with the \bltInlineVerb{-static} option, which implicitly compiles the program to not be position independent.
 
 \section{Protection}
 \paragraph{Stack canaries}
@@ -174,6 +174,7 @@ Stack canaries are one of the most effective approaches against ROP, they are en
 \paragraph{NX}
 The activation of the NX bit has no effect on ROP since the program never executes code outside the segments marked with the \bltInlineVerb{CODE} flag like in a classical stack overflow attack.
 \paragraph{ASLR}
+ASLR is a good protection against ROP since libraries and code locations get randomized each time the program is run. 32 Bit binaries only use 16 Bit for ASLR
 \paragraph{PIE}
 
 \section{Discussion}

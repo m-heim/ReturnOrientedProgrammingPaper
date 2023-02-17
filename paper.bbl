@@ -6,6 +6,11 @@ Saif El-Sherei.
 \newblock
   \url{https://www.exploit-db.com/docs/english/28479-return-oriented-programming-(rop-ftw).pdf}.
 
+\bibitem[Nyf]{rny}
+Rene Nyffenegger.
+\newblock
+  \url{https://renenyffenegger.ch/notes/Linux/fhs/proc/sys/kernel/randomize_va_space}.
+
 \bibitem[Pix16]{pixis}
 Pixis.
 \newblock Rop - return oriented programming.
